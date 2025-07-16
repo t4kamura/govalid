@@ -136,7 +136,7 @@ Even complex validators like email and URL are optimized with:
 - Zero memory allocations
 
 ### 4. String Length Performance
-Unicode-aware string validators are 4.8-6.0x faster despite proper UTF-8 handling.
+Unicode-aware string validators are 5x to 10x faster despite proper UTF-8 handling.
 
 ## govalid-Exclusive Features
 
@@ -196,7 +196,7 @@ go test ./benchmark/ -bench=. -benchmem
 govalid delivers exceptional performance improvements across all reflection-based validators:
 
 ### Performance Improvements by Library
-- **vs go-playground/validator**: 4.8x to 44.8x faster
+- **vs go-playground/validator**: 5x to 44x faster
 - **vs go-validator/validator**: 1.0x to 186.5x faster  
 - **vs ozzo-validation**: 1.1x to 185.6x faster
 - **vs gookit/validate**: 221.1x to 4543.1x faster

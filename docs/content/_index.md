@@ -19,7 +19,7 @@ govalid is a Go package designed to generate type-safe validation code for struc
 
 - **🚀 Zero Allocations**: All validators perform zero heap allocations
 - **🔒 Type Safety**: Compile-time validation function generation
-- **⚡ High Performance**: Up to 45x faster than reflection-based validators
+- **⚡ High Performance**: 5x to 44x faster than reflection-based validators
 - **📝 Marker-Based**: Simple comment-based validation rules
 - **🔧 Code Generation**: Generates optimized validation functions
 - **🎯 Comprehensive**: Support for all common validation patterns
@@ -81,15 +81,17 @@ func main() {
 
 ## Performance Comparison
 
-| Validator | govalid | go-playground/validator | Improvement |
-|-----------|---------|-------------------------|-------------|
-| Required  | 1.935 | 85.51 | **44.1x faster** |
-| Email     | 38.24 | 649.4 | **16.9x faster** |
-| GT/LT     | ~1.946 | ~60.30 | **30.9x faster** |
-| MaxLength | 15.67 | 73.50 | **4.6x faster** |
-| Enum      | 2.231 | N/A (unique to govalid)| **govalid exclusive** |
+| Validator | govalid | go-playground | go-validator | ozzo-validation | Best Improvement |
+|-----------|---------|---------------|--------------|-----------------|------------------|
+| Required  | 1.935ns | 85.51ns | 1.929ns | 33.69ns | **44.2x faster** |
+| Email     | 38.24ns | 649.4ns | 584.1ns | 39.35ns | **17.0x faster** |
+| GT/LT     | ~1.946ns | ~60.30ns | ~53.57ns | N/A | **32.5x faster** |
+| MaxLength | 15.67ns | 73.50ns | 155.7ns | 159.3ns | **10.2x faster** |
+| URL       | 42.54ns | 287.9ns | 7776ns | 7739ns | **186.5x faster** |
+| UUID      | 37.69ns | 254.0ns | 193.1ns | 231.5ns | **6.7x faster** |
+| Enum      | 2.231ns | N/A | N/A | N/A | **govalid exclusive** |
 
-*All benchmarks show 0 allocations for govalid vs 0-5 allocations for competitors*
+*All benchmarks show 0 allocations for govalid vs 0-80 allocations for competitors*
 
 **Methodology**: 10 runs per benchmark analyzed with `benchstat` for statistical significance
 

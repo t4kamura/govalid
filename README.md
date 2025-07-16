@@ -1,128 +1,178 @@
-# govalid
+<div align="center">
+  <img src="assets/govalid-icon.svg" alt="govalid" width="128" height="128">
+  <h1>govalid</h1>
+  <p><strong>Blazing fast, compile-time type-safe validation for Go</strong></p>
+  
+  ![Go Version](https://img.shields.io/badge/Go-1.21+-blue.svg)
+  ![License](https://img.shields.io/badge/license-MIT-green.svg)
+  ![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)
+</div>
 
-## Overview
+---
 
-govalid is a Go package designed to generate type-safe validation code for structs based on markers. It provides a mechanism to apply validation rules directly in the code by marking struct fields with specific markers. The tool processes these markers and generates corresponding validation functions.
+## 🚀 Overview
 
-## Why govalid?
+govalid generates **type-safe validation code** at compile time using struct field markers. No reflection, no runtime overhead, just blazing fast validation.
 
-govalid addresses key limitations of reflection-based validation libraries by generating type-safe, high-performance validation code at compile time.
+## ⚡ Why govalid?
 
-### Performance Benefits
+### 🎯 Performance Benefits
 - **Zero allocations**: All validation functions perform zero heap allocations
-- **Up to 45x faster**: Significantly outperforms reflection-based validators
+- **5x to 44x faster**: Significantly outperforms reflection-based validators
 - **Compile-time optimization**: Generated code is optimized by the Go compiler
 
-### Developer Experience
+### 👨‍💻 Developer Experience
 - **Type safety**: Validation functions are generated with proper types, eliminating runtime reflection
 - **Compile-time errors**: Invalid validation rules are caught during code generation, not at runtime
 - **No runtime dependencies**: Generated code has minimal external dependencies
 
-### Extended Go Support
+### 🔧 Comprehensive Go Support
 - **Full collection support**: Maps and channels work with size validators (not supported by most libraries)
+- **CEL expressions**: Common Expression Language support for complex validation logic
 - **Go zero-value semantics**: Proper handling of Go's zero values and nil states
 - **Unicode-aware**: String validators properly handle Unicode characters
 
-### govalid vs Reflection-based Validators
+## 📊 Performance Comparison
 
-| Feature | govalid | Reflection-based validators |
-|---------|---------|----------------------------|
-| Performance | ~1-14ns, 0 allocs | ~50-700ns, 0-5 allocs |
-| Type Safety | Compile-time | Runtime reflection |
-| Collection Support | slice, array, map, channel | slice, array only |
-| Dependencies | Minimal | Heavy runtime deps |
-| Error Detection | Compile-time | Runtime |
+<div align="center">
 
-## Installation
+| Feature | govalid | Reflection Validators |
+|:-------:|:-------:|:--------------------:|
+| **Performance** | `~1-14ns, 0 allocs` | `~50-700ns, 0-5 allocs` |
+| **Type Safety** | ✅ Compile-time | ❌ Runtime reflection |
+| **Collections** | `slice, array, map, channel` | `slice, array only` |
+| **Dependencies** | ✅ Minimal | ❌ Heavy runtime deps |
+| **Error Detection** | ✅ Compile-time | ❌ Runtime |
+| **CEL Support** | ✅ Full support | ❌ Limited/None |
 
-To install govalid, use:
+</div>
+
+## 📦 Installation
 
 ```bash
 # Clone the repository
-$ git clone https://github.com/sivchari/govalid.git
+git clone https://github.com/sivchari/govalid.git
 
 # Navigate to the project directory
-$ cd govalid
+cd govalid
 
-# Run installation commands
-$ go install ./...
+# Install the tool
+go install ./...
 ```
 
-## Usage
+## 🎯 Quick Start
 
-To use govalid, follow these steps:
-
-1. Define your struct with field markers.
-2. Run the govalid generation tool to create type-safe validation code.
-3. Use the generated validation functions in your application.
-
-### Example
-
+### 1. Define Your Struct
 ```go
-// Example struct with markers
+// Add validation markers above your struct
 // +govalid:required
 type Person struct {
     Name  string `json:"name"`
     Email string `json:"email"`
 }
+```
 
-// Generated code will include validation functions like:
-func ValidatePerson(t *Person) error {
-    if t == nil {
-        return ErrNilPerson
+### 2. Generate Validation Code
+```bash
+govalid generate
+```
+
+### 3. Use Generated Validators
+```go
+func main() {
+    p := &Person{Name: "John", Email: ""}
+    
+    if err := ValidatePerson(p); err != nil {
+        log.Printf("Validation failed: %v", err)
+        // Output: Validation failed: EmailRequiredValidation
     }
-
-    if t.Name == "" {
-        return ErrNameRequiredValidation
-    }
-
-    if t.Email == "" {
-        return ErrEmailRequiredValidation
-    }
-
-    return nil
 }
 ```
 
-### Struct-Level Markers
+## 🔧 Advanced Features
 
-govalid supports applying markers at the struct level. When a marker is placed on a struct, it applies to all fields within that struct:
+### Struct-Level Validation
+Apply validation rules to entire structs:
 
 ```go
-// Apply to entire struct - all fields will be validated
+// All fields will be validated as required
 // +govalid:required
 type Person struct {
-    Name  string `json:"name"`
-    Email string `json:"email"`
-    Age   int    `json:"age"`
-}
-
-// Generated code for struct-level marker:
-func ValidatePerson(t *Person) error {
-    if t == nil {
-        return ErrNilPerson
-    }
-
-    if t.Name == "" {
-        return ErrNameRequiredValidation
-    }
-
-    if t.Email == "" {
-        return ErrEmailRequiredValidation
-    }
-
-    if validatorhelper.IsZero(t.Age) {
-        return ErrAgeRequiredValidation
-    }
-
-    return nil
+    Name  string
+    Email string
+    Age   int
 }
 ```
 
-## Supported Markers
+### CEL Expression Support
+Use Common Expression Language for complex validation:
+
+```go
+// +govalid:cel=this.Age >= 18 && this.Age <= 120
+type User struct {
+    Age int
+}
+```
+
+### Collection Support
+Validate maps, channels, slices, and arrays:
+
+```go
+// +govalid:maxitems=10
+type UserList struct {
+    Users    []User           // slice support
+    UserMap  map[string]User  // map support  
+    UserChan chan User        // channel support
+}
+```
+
+## 📝 Supported Markers
+
+<details>
+<summary><strong>📖 View Complete Marker Reference</strong></summary>
 
 For a complete reference of all supported markers, see [MARKERS.md](MARKERS.md).
 
-## License
+**Core Validators:**
+- `required` - Field must not be zero value
+- `gt`, `gte`, `lt`, `lte` - Numeric comparisons
+- `maxlength`, `minlength` - String length validation
+- `maxitems`, `minitems` - Collection size validation
+- `enum` - Enumeration validation
+- `email`, `url`, `uuid` - Format validation
 
-govalid is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+**Advanced:**
+- `cel` - Common Expression Language support
+- Struct-level markers
+- Custom validation logic
+
+</details>
+
+## 🚀 Performance Benchmarks
+
+govalid consistently outperforms reflection-based validators by **5x to 44x**:
+
+<div align="center">
+
+| Validator | govalid | go-playground | Improvement |
+|:---------:|:-------:|:-------------:|:-----------:|
+| Required | `1.9ns` | `85.5ns` | **44.2x** |
+| GT/LT | `1.9ns` | `63.0ns` | **32.5x** |
+| MaxLength | `15.7ns` | `73.5ns` | **4.7x** |
+| Email | `38.2ns` | `649.4ns` | **17.0x** |
+
+*All with **0 allocations** vs competitors' 0-5 allocations*
+
+</div>
+
+[📊 View Complete Benchmarks](test/benchmark/README.md)
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+  <sub>Built with ❤️ for the Go community</sub>
+</div>

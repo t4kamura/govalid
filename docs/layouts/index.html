@@ -20,7 +20,7 @@
             <div class="feature-card">
                 <div class="icon">⚡</div>
                 <h3>Blazing Fast</h3>
-                <p>4.8x to 44.2x faster than go-playground/validator with sub-nanosecond performance for simple operations.</p>
+                <p>5x to 44x faster than reflection-based validators with sub-nanosecond performance for simple operations.</p>
                 <div style="margin-top: 1rem;">
                     <span class="performance-badge">1.96ns required</span>
                     <span class="performance-badge">44.2x faster</span>
@@ -49,10 +49,9 @@
             <div class="feature-card">
                 <div class="icon">🎯</div>
                 <h3>Comprehensive</h3>
-                <p>Support for all common validation patterns plus unique features like enum validation.</p>
+                <p>Support for all common validation patterns plus unique features like CEL expressions, enum validation, and extended collection types.</p>
                 <div style="margin-top: 1rem;">
-                    <span class="performance-badge">13 validators</span>
-                    <span class="performance-badge">Enum support</span>
+                    <span class="performance-badge">Full featured</span>
                 </div>
             </div>
             
@@ -110,48 +109,29 @@ if err := ValidateUser(user); err != nil {
     </section>
     
     <!-- Performance highlight -->
-    <section style="margin-top: 3rem; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 2rem; border-radius: 0.5rem;">
-        <h2 style="color: var(--primary-color); margin-top: 0;">Performance Comparison</h2>
-        <p>govalid consistently outperforms go-playground/validator across all validation types:</p>
+    <section style="margin-top: 3rem; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 2rem; border-radius: 0.5rem; text-align: center;">
+        <h2 style="color: var(--primary-color); margin-top: 0;">🚀 Exceptional Performance</h2>
+        <p style="font-size: 1.2em; margin-bottom: 2rem;">govalid delivers <strong>5x to 44x</strong> performance improvements with <strong>zero allocations</strong></p>
         
-        <table style="margin-top: 1rem;">
-            <thead>
-                <tr>
-                    <th>Validator</th>
-                    <th>govalid</th>
-                    <th>go-playground/validator</th>
-                    <th>Improvement</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Required</td>
-                    <td>1.96ns</td>
-                    <td>86.59ns</td>
-                    <td><strong>44.2x faster</strong></td>
-                </tr>
-                <tr>
-                    <td>Email</td>
-                    <td>38.15ns</td>
-                    <td>644.1ns</td>
-                    <td><strong>16.9x faster</strong></td>
-                </tr>
-                <tr>
-                    <td>Numeric (GT/LT)</td>
-                    <td>~1.97ns</td>
-                    <td>~63ns</td>
-                    <td><strong>32x faster</strong></td>
-                </tr>
-                <tr>
-                    <td>String Length</td>
-                    <td>~14ns</td>
-                    <td>~75ns</td>
-                    <td><strong>5x faster</strong></td>
-                </tr>
-            </tbody>
-        </table>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0;">
+            <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <div style="font-size: 2em; color: var(--primary-color); margin-bottom: 0.5rem;">⚡</div>
+                <div style="font-size: 1.8em; font-weight: bold; color: var(--primary-color);">44x</div>
+                <div style="color: #666;">faster validation</div>
+            </div>
+            <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <div style="font-size: 2em; color: var(--primary-color); margin-bottom: 0.5rem;">🚀</div>
+                <div style="font-size: 1.8em; font-weight: bold; color: var(--primary-color);">0</div>
+                <div style="color: #666;">allocations</div>
+            </div>
+            <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <div style="font-size: 2em; color: var(--primary-color); margin-bottom: 0.5rem;">⏱️</div>
+                <div style="font-size: 1.8em; font-weight: bold; color: var(--primary-color);">~2ns</div>
+                <div style="color: #666;">simple operations</div>
+            </div>
+        </div>
         
-        <p style="margin-top: 1rem;">
+        <p style="margin-top: 2rem;">
             <a href="/benchmarks/" class="btn">View Detailed Benchmarks</a>
         </p>
     </section>

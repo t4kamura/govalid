@@ -137,7 +137,8 @@ func analyzeMarker(pass *codegen.Pass, markersInspect markers.Markers, structTyp
 			}
 
 			analyzed = append(analyzed, &AnalyzedMetadata{
-				Validators: validators,
+				Validators:     validators,
+				ParentVariable: parent,
 			})
 
 			continue

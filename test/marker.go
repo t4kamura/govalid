@@ -145,3 +145,8 @@ type Length struct {
 	// +govalid:length=7
 	Name string `validate:"len=7" json:"name"`
 }
+
+type Numeric struct {
+	// +govalid:numeric
+	Number string `json:"Number"`
+}

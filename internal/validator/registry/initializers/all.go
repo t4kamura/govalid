@@ -21,6 +21,7 @@ func All() []registry.ValidatorInitializer {
 		MaxlengthInitializer{},
 		MinitemsInitializer{},
 		MinlengthInitializer{},
+		NumericInitializer{},
 		RequiredInitializer{},
 		UrlInitializer{},
 		UuidInitializer{},

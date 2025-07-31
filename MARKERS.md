@@ -457,3 +457,32 @@ govalid supports the following markers:
     return nil
   }
   ```
+
+## `govalid:numeric`
+
+- **Description**: Ensures that a string field contains only digit characters (`0`–`9`). Leading zeros are allowed. Negative signs, decimal points, or scientific notation are **not** accepted.
+
+- **Example**:
+
+  ```go
+  type Payload struct {
+      // +govalid:numeric
+      Phone string `json:"phone"`
+  }
+  ```
+
+- **Generated Code**:
+
+  ```go
+  func ValidatePayload(t *Payload) error {
+      if t == nil {
+          return ErrNilPayload
+      }
+
+      if !validationhelper.IsNumeric(t.Phone) {
+          return ErrPayloadPhoneNumericValidation
+      }
+
+      return nil
+  }
+  ```

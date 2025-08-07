@@ -18,6 +18,7 @@ type gteValidator struct {
 	field      *ast.Field
 	gteValue   string
 	structName string
+	ruleName   string
 }
 
 var _ validator.Validator = (*gteValidator)(nil)
@@ -34,19 +35,31 @@ func (m *gteValidator) FieldName() string {
 
 func (m *gteValidator) Err() string {
 	key := fmt.Sprintf(gteKey, m.structName+m.FieldName())
+
 	if validator.GeneratorMemory[key] {
 		return ""
 	}
 
 	validator.GeneratorMemory[key] = true
 
-	return fmt.Sprintf(strings.ReplaceAll(`
-	// Err@GTEValidation is the error returned when the value of the field is less than %s.
-	Err@GTEValidation = errors.New("field @ must be greater than or equal to %s")`, "@", m.structName+m.FieldName()), m.gteValue, m.gteValue)
+	const errTemplate = `
+		// [@ERRVARIABLE] is the error returned when the value of the field is less than [@VALUE].
+		[@ERRVARIABLE] = govaliderrors.ValidationError{Reason:"field [@FIELD] must be greater than or equal to [@VALUE]",Path:"[@PATH]",Type:"[@TYPE]"}
+	`
+
+	replacer := strings.NewReplacer(
+		"[@ERRVARIABLE]", m.ErrVariable(),
+		"[@FIELD]", m.FieldName(),
+		"[@VALUE]", m.gteValue,
+		"[@PATH]", fmt.Sprintf("%s.%s", m.structName, m.FieldName()),
+		"[@TYPE]", m.ruleName,
+	)
+
+	return replacer.Replace(errTemplate)
 }
 
 func (m *gteValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err@GTEValidation", "@", m.structName+m.FieldName())
+	return strings.ReplaceAll("Err[@PATH]GTEValidation", "[@PATH]", m.structName+m.FieldName())
 }
 
 func (m *gteValidator) Imports() []string {
@@ -54,7 +67,7 @@ func (m *gteValidator) Imports() []string {
 }
 
 // ValidateGTE creates a new gteValidator if the field type is numeric and the gte marker is present.
-func ValidateGTE(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName string) validator.Validator {
+func ValidateGTE(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string) validator.Validator {
 	typ := pass.TypesInfo.TypeOf(field.Type)
 	basic, ok := typ.Underlying().(*types.Basic)
 
@@ -72,5 +85,6 @@ func ValidateGTE(pass *codegen.Pass, field *ast.Field, expressions map[string]st
 		field:      field,
 		gteValue:   gteValue,
 		structName: structName,
+		ruleName:   ruleName,
 	}
 }

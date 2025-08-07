@@ -18,6 +18,7 @@ type ltValidator struct {
 	field      *ast.Field
 	ltValue    string
 	structName string
+	ruleName   string
 }
 
 var _ validator.Validator = (*ltValidator)(nil)
@@ -34,19 +35,31 @@ func (m *ltValidator) FieldName() string {
 
 func (m *ltValidator) Err() string {
 	key := fmt.Sprintf(ltKey, m.structName+m.FieldName())
+
 	if validator.GeneratorMemory[key] {
 		return ""
 	}
 
 	validator.GeneratorMemory[key] = true
 
-	return fmt.Sprintf(strings.ReplaceAll(`
-	// Err@LTValidation is the error returned when the value of the field is greater than the %s.
-	Err@LTValidation = errors.New("field @ must be less than %s")`, "@", m.structName+m.FieldName()), m.ltValue, m.ltValue)
+	const errTemplate = `
+		// [@ERRVARIABLE] is the error returned when the value of the field is greater than the [@VALUE].
+		[@ERRVARIABLE] = govaliderrors.ValidationError{Reason:"field [@FIELD] must be less than [@VALUE]",Path:"[@PATH]",Type:"[@TYPE]"}
+	`
+
+	replacer := strings.NewReplacer(
+		"[@ERRVARIABLE]", m.ErrVariable(),
+		"[@FIELD]", m.FieldName(),
+		"[@VALUE]", m.ltValue,
+		"[@PATH]", fmt.Sprintf("%s.%s", m.structName, m.FieldName()),
+		"[@TYPE]", m.ruleName,
+	)
+
+	return replacer.Replace(errTemplate)
 }
 
 func (m *ltValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err@LTValidation", "@", m.structName+m.FieldName())
+	return strings.ReplaceAll("Err[@PATH]LTValidation", "[@PATH]", m.structName+m.FieldName())
 }
 
 func (m *ltValidator) Imports() []string {
@@ -54,7 +67,7 @@ func (m *ltValidator) Imports() []string {
 }
 
 // ValidateLT creates a new ltValidator if the field type is numeric and the min marker is present.
-func ValidateLT(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName string) validator.Validator {
+func ValidateLT(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string) validator.Validator {
 	typ := pass.TypesInfo.TypeOf(field.Type)
 	basic, ok := typ.Underlying().(*types.Basic)
 
@@ -72,5 +85,6 @@ func ValidateLT(pass *codegen.Pass, field *ast.Field, expressions map[string]str
 		field:      field,
 		ltValue:    ltValue,
 		structName: structName,
+		ruleName:   ruleName,
 	}
 }

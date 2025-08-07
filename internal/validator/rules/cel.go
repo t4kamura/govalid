@@ -20,6 +20,7 @@ type celValidator struct {
 	field      *ast.Field
 	expression string
 	structName string
+	ruleName   string
 }
 
 var _ validator.Validator = (*celValidator)(nil)
@@ -50,31 +51,32 @@ func (c *celValidator) FieldName() string {
 
 func (c *celValidator) Err() string {
 	fieldName := c.FieldName()
-
-	var result strings.Builder
-
-	// Generate error variable only once per field
 	key := fmt.Sprintf(celKey, c.structName+fieldName)
+
 	if validator.GeneratorMemory[key] {
-		return result.String()
+		return ""
 	}
 
 	validator.GeneratorMemory[key] = true
 
-	// Generate error variable with the CEL expression included for debugging
-	result.WriteString(strings.ReplaceAll(`
-	// Err@CELValidation is the error returned when the CEL expression evaluation fails.
-	Err@CELValidation = errors.New("field @ failed CEL validation: EXPRESSION")`, "@", c.structName+fieldName))
+	const errTemplate = `
+		// [@ERRVARIABLE] is the error returned when the CEL expression evaluation fails.
+		[@ERRVARIABLE] = govaliderrors.ValidationError{Reason:"field [@FIELD] failed CEL validation: [@EXPRESSION]",Path:"[@PATH]",Type:"[@TYPE]"}
+	`
 
-	// Replace EXPRESSION placeholder with the actual CEL expression
-	errorString := result.String()
-	errorString = strings.ReplaceAll(errorString, "EXPRESSION", c.expression)
+	replacer := strings.NewReplacer(
+		"[@ERRVARIABLE]", c.ErrVariable(),
+		"[@FIELD]", fieldName,
+		"[@PATH]", fmt.Sprintf("%s.%s", c.structName, fieldName),
+		"[@EXPRESSION]", c.expression,
+		"[@TYPE]", c.ruleName,
+	)
 
-	return errorString
+	return replacer.Replace(errTemplate)
 }
 
 func (c *celValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err@CELValidation", "@", c.structName+c.FieldName())
+	return strings.ReplaceAll("Err[@PATH]CELValidation", "[@PATH]", c.structName+c.FieldName())
 }
 
 func (c *celValidator) Imports() []string {
@@ -132,7 +134,7 @@ func (c *celValidator) needsTimeImport() bool {
 
 // ValidateCEL creates a new celValidator for fields with CEL marker.
 // This validator supports all field types since CEL can handle various data types.
-func ValidateCEL(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName string) validator.Validator {
+func ValidateCEL(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string) validator.Validator {
 	celExpression, ok := expressions[markers.GoValidMarkerCel]
 	if !ok {
 		return nil
@@ -148,6 +150,7 @@ func ValidateCEL(pass *codegen.Pass, field *ast.Field, expressions map[string]st
 		field:      field,
 		expression: celExpression,
 		structName: structName,
+		ruleName:   ruleName,
 	}
 }
 

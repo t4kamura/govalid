@@ -17,6 +17,7 @@ type requiredValidator struct {
 	pass       *codegen.Pass
 	field      *ast.Field
 	structName string
+	ruleName   string
 }
 
 var _ validator.Validator = (*requiredValidator)(nil)
@@ -52,19 +53,30 @@ func (r *requiredValidator) FieldName() string {
 
 func (r *requiredValidator) Err() string {
 	key := fmt.Sprintf(requiredKey, r.structName+r.FieldName())
+
 	if validator.GeneratorMemory[key] {
 		return ""
 	}
 
 	validator.GeneratorMemory[key] = true
 
-	return strings.ReplaceAll(`
-	// Err@RequiredValidation is returned when the @ is required but not provided.
-	Err@RequiredValidation = errors.New("field @ is required")`, "@", r.structName+r.FieldName())
+	const errTemplate = `
+		// [@ERRVARIABLE] is returned when the [@FIELD] is required but not provided.
+		[@ERRVARIABLE] = govaliderrors.ValidationError{Reason:"field [@FIELD] is required",Path:"[@PATH]",Type:"[@TYPE]"}
+	`
+
+	replacer := strings.NewReplacer(
+		"[@ERRVARIABLE]", r.ErrVariable(),
+		"[@FIELD]", r.FieldName(),
+		"[@PATH]", fmt.Sprintf("%s.%s", r.structName, r.FieldName()),
+		"[@TYPE]", r.ruleName,
+	)
+
+	return replacer.Replace(errTemplate)
 }
 
 func (r *requiredValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err@RequiredValidation", "@", r.structName+r.FieldName())
+	return strings.ReplaceAll("Err[@PATH]RequiredValidation", "[@PATH]", r.structName+r.FieldName())
 }
 
 func (r *requiredValidator) Imports() []string {
@@ -72,12 +84,13 @@ func (r *requiredValidator) Imports() []string {
 }
 
 // ValidateRequired creates a new required validator for the given field.
-func ValidateRequired(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName string) validator.Validator {
+func ValidateRequired(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName string) validator.Validator {
 	validator.GeneratorMemory[fmt.Sprintf(requiredKey, structName+field.Names[0].Name)] = false
 
 	return &requiredValidator{
 		pass:       pass,
 		field:      field,
 		structName: structName,
+		ruleName:   ruleName,
 	}
 }

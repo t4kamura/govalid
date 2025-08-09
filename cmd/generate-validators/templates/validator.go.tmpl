@@ -72,10 +72,6 @@ func (v *{{.MarkerName}}Validator) Imports() []string {
 
 // Validate{{.StructName}} creates a new {{.MarkerName}} validator for the given field.
 func Validate{{.StructName}}(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string, parentPath string) validator.Validator {
-	fieldName := field.Names[0].Name
-	fieldPath := validator.NewFieldPath(structName, parentPath, fieldName)
-	validator.GeneratorMemory[fmt.Sprintf({{.MarkerName}}Key, fieldPath.WithoutDots())] = false
-
 	return &{{.MarkerName}}Validator{
 		pass:       pass,
 		field:      field,

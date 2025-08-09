@@ -70,7 +70,7 @@ func (v *alphaValidator) Imports() []string {
 }
 
 // ValidateAlpha creates a new alphaValidator for string types.
-func ValidateAlpha(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+func ValidateAlpha(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName, parentPath string) validator.Validator {
 	fieldName := field.Names[0].Name
 	fieldPath := validator.NewFieldPath(structName, parentPath, fieldName)
 	validator.GeneratorMemory[fmt.Sprintf(alphaKey, fieldPath.WithoutDots())] = false

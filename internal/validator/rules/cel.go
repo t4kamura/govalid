@@ -138,7 +138,7 @@ func (c *celValidator) needsTimeImport() bool {
 
 // ValidateCEL creates a new celValidator for fields with CEL marker.
 // This validator supports all field types since CEL can handle various data types.
-func ValidateCEL(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+func ValidateCEL(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName, parentPath string) validator.Validator {
 	fieldName := field.Names[0].Name
 	fieldPath := validator.NewFieldPath(structName, parentPath, fieldName)
 	validator.GeneratorMemory[fmt.Sprintf(celKey, fieldPath.WithoutDots())] = false

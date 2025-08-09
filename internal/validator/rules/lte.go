@@ -72,7 +72,7 @@ func (m *lteValidator) Imports() []string {
 }
 
 // ValidateLTE creates a new lteValidator if the field type is numeric and the lte marker is present.
-func ValidateLTE(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+func ValidateLTE(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName, parentPath string) validator.Validator {
 	fieldPath := validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
 	validator.GeneratorMemory[fmt.Sprintf(lteKey, structName+fieldPath.WithoutDots())] = false
 

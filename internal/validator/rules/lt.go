@@ -72,7 +72,7 @@ func (m *ltValidator) Imports() []string {
 }
 
 // ValidateLT creates a new ltValidator if the field type is numeric and the min marker is present.
-func ValidateLT(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+func ValidateLT(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName, parentPath string) validator.Validator {
 	fieldPath := validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
 	validator.GeneratorMemory[fmt.Sprintf(ltKey, structName+fieldPath.WithoutDots())] = false
 

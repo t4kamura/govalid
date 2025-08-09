@@ -89,7 +89,7 @@ func (r *requiredValidator) Imports() []string {
 }
 
 // ValidateRequired creates a new required validator for the given field.
-func ValidateRequired(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+func ValidateRequired(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName, parentPath string) validator.Validator {
 	fieldName := field.Names[0].Name
 	fieldPath := validator.NewFieldPath(structName, parentPath, fieldName)
 	validator.GeneratorMemory[fmt.Sprintf(requiredKey, fieldPath.WithoutDots())] = false

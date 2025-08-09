@@ -8,7 +8,15 @@ type FieldPath string
 
 // NewFieldPath creates a new FieldPath from the given components.
 func NewFieldPath(components ...string) FieldPath {
-	return FieldPath(strings.Join(components, "."))
+	var nonEmpty []string
+
+	for _, component := range components {
+		if strings.TrimSpace(component) != "" {
+			nonEmpty = append(nonEmpty, component)
+		}
+	}
+
+	return FieldPath(strings.Join(nonEmpty, "."))
 }
 
 // WithoutDots returns the field path with all dots removed for use in variable names and keys.

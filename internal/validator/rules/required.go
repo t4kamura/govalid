@@ -53,9 +53,6 @@ func (r *requiredValidator) FieldName() string {
 }
 
 func (r *requiredValidator) FieldPath() validator.FieldPath {
-	if r.parentPath == "" {
-		return validator.NewFieldPath(r.structName, r.FieldName())
-	}
 	return validator.NewFieldPath(r.structName, r.parentPath, r.FieldName())
 }
 
@@ -94,12 +91,7 @@ func (r *requiredValidator) Imports() []string {
 // ValidateRequired creates a new required validator for the given field.
 func ValidateRequired(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName string, parentPath string) validator.Validator {
 	fieldName := field.Names[0].Name
-	var fieldPath validator.FieldPath
-	if parentPath != "" {
-		fieldPath = validator.NewFieldPath(structName, parentPath, fieldName)
-	} else {
-		fieldPath = validator.NewFieldPath(structName, fieldName)
-	}
+	fieldPath := validator.NewFieldPath(structName, parentPath, fieldName)
 	validator.GeneratorMemory[fmt.Sprintf(requiredKey, fieldPath.WithoutDots())] = false
 
 	return &requiredValidator{

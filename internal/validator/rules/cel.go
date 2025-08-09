@@ -51,9 +51,6 @@ func (c *celValidator) FieldName() string {
 }
 
 func (c *celValidator) FieldPath() validator.FieldPath {
-	if c.parentPath == "" {
-		return validator.NewFieldPath(c.structName, c.FieldName())
-	}
 	return validator.NewFieldPath(c.structName, c.parentPath, c.FieldName())
 }
 
@@ -143,12 +140,7 @@ func (c *celValidator) needsTimeImport() bool {
 // This validator supports all field types since CEL can handle various data types.
 func ValidateCEL(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string, parentPath string) validator.Validator {
 	fieldName := field.Names[0].Name
-	var fieldPath validator.FieldPath
-	if parentPath != "" {
-		fieldPath = validator.NewFieldPath(structName, parentPath, fieldName)
-	} else {
-		fieldPath = validator.NewFieldPath(structName, fieldName)
-	}
+	fieldPath := validator.NewFieldPath(structName, parentPath, fieldName)
 	validator.GeneratorMemory[fmt.Sprintf(celKey, fieldPath.WithoutDots())] = false
 	
 	celExpression, ok := expressions[markers.GoValidMarkerCel]

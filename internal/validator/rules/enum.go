@@ -52,9 +52,6 @@ func (e *enumValidator) FieldName() string {
 }
 
 func (e *enumValidator) FieldPath() validator.FieldPath {
-	if e.parentPath == "" {
-		return validator.NewFieldPath(e.structName, e.FieldName())
-	}
 	return validator.NewFieldPath(e.structName, e.parentPath, e.FieldName())
 }
 
@@ -95,10 +92,7 @@ func (e *enumValidator) Imports() []string {
 
 // ValidateEnum creates a new enumValidator for string, numeric, and custom types.
 func ValidateEnum(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string, parentPath string) validator.Validator {
-	fieldPath := validator.NewFieldPath(structName, field.Names[0].Name)
-	if parentPath != "" {
-		fieldPath = validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
-	}
+	fieldPath := validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
 	validator.GeneratorMemory[fmt.Sprintf(enumKey, structName+fieldPath.WithoutDots())] = false
 	
 	typ := pass.TypesInfo.TypeOf(field.Type)

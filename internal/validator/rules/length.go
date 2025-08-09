@@ -34,9 +34,6 @@ func (l *lengthValidator) FieldName() string {
 }
 
 func (l *lengthValidator) FieldPath() validator.FieldPath {
-	if l.parentPath == "" {
-		return validator.NewFieldPath(l.structName, l.FieldName())
-	}
 	return validator.NewFieldPath(l.structName, l.parentPath, l.FieldName())
 }
 
@@ -75,10 +72,7 @@ func (l *lengthValidator) Imports() []string {
 
 // ValidateLength creates a new lengthValidator if the field type is string and the length marker is present.
 func ValidateLength(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string, parentPath string) validator.Validator {
-	fieldPath := validator.NewFieldPath(structName, field.Names[0].Name)
-	if parentPath != "" {
-		fieldPath = validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
-	}
+	fieldPath := validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
 	validator.GeneratorMemory[fmt.Sprintf(lengthKey, structName+fieldPath.WithoutDots())] = false
 	
 	typ := pass.TypesInfo.TypeOf(field.Type)

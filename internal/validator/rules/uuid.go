@@ -35,9 +35,6 @@ func (u *uuidValidator) FieldName() string {
 }
 
 func (u *uuidValidator) FieldPath() validator.FieldPath {
-	if u.parentPath == "" {
-		return validator.NewFieldPath(u.structName, u.FieldName())
-	}
 	return validator.NewFieldPath(u.structName, u.parentPath, u.FieldName())
 }
 
@@ -144,10 +141,7 @@ func (u *uuidValidator) Imports() []string {
 
 // ValidateUUID creates a new uuidValidator for string types.
 func ValidateUUID(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName string, parentPath string) validator.Validator {
-	fieldPath := validator.NewFieldPath(structName, field.Names[0].Name)
-	if parentPath != "" {
-		fieldPath = validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
-	}
+	fieldPath := validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
 	validator.GeneratorMemory[fmt.Sprintf(uuidKey, structName+fieldPath.WithoutDots())] = false
 	
 	typ := pass.TypesInfo.TypeOf(field.Type)

@@ -35,9 +35,6 @@ func (m *gteValidator) FieldName() string {
 }
 
 func (m *gteValidator) FieldPath() validator.FieldPath {
-	if m.parentPath == "" {
-		return validator.NewFieldPath(m.structName, m.FieldName())
-	}
 	return validator.NewFieldPath(m.structName, m.parentPath, m.FieldName())
 }
 
@@ -76,12 +73,9 @@ func (m *gteValidator) Imports() []string {
 
 // ValidateGTE creates a new gteValidator if the field type is numeric and the gte marker is present.
 func ValidateGTE(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string, parentPath string) validator.Validator {
-	fieldPath := validator.NewFieldPath(structName, field.Names[0].Name)
-	if parentPath != "" {
-		fieldPath = validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
-	}
+	fieldPath := validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
 	validator.GeneratorMemory[fmt.Sprintf(gteKey, structName+fieldPath.WithoutDots())] = false
-	
+
 	typ := pass.TypesInfo.TypeOf(field.Type)
 	basic, ok := typ.Underlying().(*types.Basic)
 

@@ -33,9 +33,6 @@ func (v *alphaValidator) FieldName() string {
 }
 
 func (v *alphaValidator) FieldPath() validator.FieldPath {
-	if v.parentPath == "" {
-		return validator.NewFieldPath(v.structName, v.FieldName())
-	}
 	return validator.NewFieldPath(v.structName, v.parentPath, v.FieldName())
 }
 
@@ -75,12 +72,7 @@ func (v *alphaValidator) Imports() []string {
 // ValidateAlpha creates a new alphaValidator for string types.
 func ValidateAlpha(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName string, parentPath string) validator.Validator {
 	fieldName := field.Names[0].Name
-	var fieldPath validator.FieldPath
-	if parentPath != "" {
-		fieldPath = validator.NewFieldPath(structName, parentPath, fieldName)
-	} else {
-		fieldPath = validator.NewFieldPath(structName, fieldName)
-	}
+	fieldPath := validator.NewFieldPath(structName, parentPath, fieldName)
 	validator.GeneratorMemory[fmt.Sprintf(alphaKey, fieldPath.WithoutDots())] = false
 	
 	typ := pass.TypesInfo.TypeOf(field.Type)

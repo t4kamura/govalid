@@ -35,9 +35,6 @@ func (e *emailValidator) FieldName() string {
 }
 
 func (e *emailValidator) FieldPath() validator.FieldPath {
-	if e.parentPath == "" {
-		return validator.NewFieldPath(e.structName, e.FieldName())
-	}
 	return validator.NewFieldPath(e.structName, e.parentPath, e.FieldName())
 }
 
@@ -76,12 +73,7 @@ func (e *emailValidator) Imports() []string {
 // ValidateEmail creates a new emailValidator for string types.
 func ValidateEmail(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName string, parentPath string) validator.Validator {
 	fieldName := field.Names[0].Name
-	var fieldPath validator.FieldPath
-	if parentPath != "" {
-		fieldPath = validator.NewFieldPath(structName, parentPath, fieldName)
-	} else {
-		fieldPath = validator.NewFieldPath(structName, fieldName)
-	}
+	fieldPath := validator.NewFieldPath(structName, parentPath, fieldName)
 	validator.GeneratorMemory[fmt.Sprintf(emailKey, fieldPath.WithoutDots())] = false
 	
 	typ := pass.TypesInfo.TypeOf(field.Type)

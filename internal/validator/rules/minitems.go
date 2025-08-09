@@ -11,6 +11,7 @@ import (
 
 	"github.com/sivchari/govalid/internal/markers"
 	"github.com/sivchari/govalid/internal/validator"
+	"github.com/sivchari/govalid/internal/validator/registry"
 )
 
 type minItemsValidator struct {
@@ -72,8 +73,8 @@ func (m *minItemsValidator) Imports() []string {
 }
 
 // ValidateMinItems creates a new minItemsValidator if the field type supports len() and the minitems marker is present.
-func ValidateMinItems(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName, parentPath string) validator.Validator {
-	typ := pass.TypesInfo.TypeOf(field.Type)
+func ValidateMinItems(input registry.ValidatorInput) validator.Validator {
+	typ := input.Pass.TypesInfo.TypeOf(input.Field.Type)
 
 	// Check if it's a type that supports len() (exclude strings - use minlength instead)
 	switch typ.Underlying().(type) {
@@ -83,17 +84,17 @@ func ValidateMinItems(pass *codegen.Pass, field *ast.Field, expressions map[stri
 		return nil
 	}
 
-	minItemsValue, ok := expressions[markers.GoValidMarkerMinitems]
+	minItemsValue, ok := input.Expressions[markers.GoValidMarkerMinitems]
 	if !ok {
 		return nil
 	}
 
 	return &minItemsValidator{
-		pass:          pass,
-		field:         field,
+		pass:          input.Pass,
+		field:         input.Field,
 		minItemsValue: minItemsValue,
-		structName:    structName,
-		ruleName:      ruleName,
-		parentPath:    parentPath,
+		structName:    input.StructName,
+		ruleName:      input.RuleName,
+		parentPath:    input.ParentPath,
 	}
 }

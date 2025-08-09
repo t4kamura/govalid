@@ -11,6 +11,7 @@ import (
 
 	"github.com/sivchari/govalid/internal/markers"
 	"github.com/sivchari/govalid/internal/validator"
+	"github.com/sivchari/govalid/internal/validator/registry"
 )
 
 type enumValidator struct {
@@ -91,10 +92,10 @@ func (e *enumValidator) Imports() []string {
 }
 
 // ValidateEnum creates a new enumValidator for string, numeric, and custom types.
-func ValidateEnum(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName, parentPath string) validator.Validator {
-	typ := pass.TypesInfo.TypeOf(field.Type)
+func ValidateEnum(input registry.ValidatorInput) validator.Validator {
+	typ := input.Pass.TypesInfo.TypeOf(input.Field.Type)
 
-	enumValue, ok := expressions[markers.GoValidMarkerEnum]
+	enumValue, ok := input.Expressions[markers.GoValidMarkerEnum]
 	if !ok {
 		return nil
 	}
@@ -110,12 +111,12 @@ func ValidateEnum(pass *codegen.Pass, field *ast.Field, expressions map[string]s
 	}
 
 	validator := &enumValidator{
-		pass:       pass,
-		field:      field,
+		pass:       input.Pass,
+		field:      input.Field,
 		enumValues: enumValues,
-		structName: structName,
-		ruleName:   ruleName,
-		parentPath: parentPath,
+		structName: input.StructName,
+		ruleName:   input.RuleName,
+		parentPath: input.ParentPath,
 	}
 
 	// Determine the type and set appropriate flags

@@ -190,7 +190,15 @@ func makeValidator(pass *codegen.Pass, markers markers.MarkerSet, field *ast.Fie
 
 		ruleName := strings.TrimPrefix(marker.Identifier, "govalid:")
 
-		v := factory(pass, field, marker.Expressions, structName, ruleName, parentPath)
+		input := registry.ValidatorInput{
+			Pass:        pass,
+			Field:       field,
+			Expressions: marker.Expressions,
+			StructName:  structName,
+			RuleName:    ruleName,
+			ParentPath:  parentPath,
+		}
+		v := factory(input)
 		if v == nil {
 			continue
 		}

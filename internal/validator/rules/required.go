@@ -10,6 +10,7 @@ import (
 	"github.com/gostaticanalysis/codegen"
 
 	"github.com/sivchari/govalid/internal/validator"
+	"github.com/sivchari/govalid/internal/validator/registry"
 	"github.com/sivchari/govalid/internal/validator/validatorhelper"
 )
 
@@ -89,16 +90,16 @@ func (r *requiredValidator) Imports() []string {
 }
 
 // ValidateRequired creates a new required validator for the given field.
-func ValidateRequired(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName, parentPath string) validator.Validator {
-	fieldName := field.Names[0].Name
-	fieldPath := validator.NewFieldPath(structName, parentPath, fieldName)
+func ValidateRequired(input registry.ValidatorInput) validator.Validator {
+	fieldName := input.Field.Names[0].Name
+	fieldPath := validator.NewFieldPath(input.StructName, input.ParentPath, fieldName)
 	validator.GeneratorMemory[fmt.Sprintf(requiredKey, fieldPath.CleanedPath())] = false
 
 	return &requiredValidator{
-		pass:       pass,
-		field:      field,
-		structName: structName,
-		ruleName:   ruleName,
-		parentPath: parentPath,
+		pass:       input.Pass,
+		field:      input.Field,
+		structName: input.StructName,
+		ruleName:   input.RuleName,
+		parentPath: input.ParentPath,
 	}
 }

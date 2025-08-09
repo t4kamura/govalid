@@ -38,7 +38,7 @@ func (v *{{.MarkerName}}Validator) FieldPath() validator.FieldPath {
 }
 
 func (v *{{.MarkerName}}Validator) Err() string {
-	key := fmt.Sprintf({{.MarkerName}}Key, v.FieldPath().WithoutDots())
+	key := fmt.Sprintf({{.MarkerName}}Key, v.FieldPath().CleanedPath())
 
 	if validator.GeneratorMemory[key] {
 		return ""
@@ -62,7 +62,7 @@ func (v *{{.MarkerName}}Validator) Err() string {
 }
 
 func (v *{{.MarkerName}}Validator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]{{.StructName}}Validation", "[@PATH]", v.FieldPath().WithoutDots())
+	return strings.ReplaceAll("Err[@PATH]{{.StructName}}Validation", "[@PATH]", v.FieldPath().CleanedPath())
 }
 
 func (v *{{.MarkerName}}Validator) Imports() []string {

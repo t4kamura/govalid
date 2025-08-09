@@ -40,7 +40,7 @@ func (e *emailValidator) FieldPath() validator.FieldPath {
 
 func (e *emailValidator) Err() string {
 	// No need to generate inline function - using external helper
-	key := fmt.Sprintf(emailKey, e.FieldPath().WithoutDots())
+	key := fmt.Sprintf(emailKey, e.FieldPath().CleanedPath())
 	if validator.GeneratorMemory[key] {
 		return ""
 	}
@@ -63,7 +63,7 @@ func (e *emailValidator) Err() string {
 }
 
 func (e *emailValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]EmailValidation", `[@PATH]`, e.FieldPath().WithoutDots())
+	return strings.ReplaceAll("Err[@PATH]EmailValidation", `[@PATH]`, e.FieldPath().CleanedPath())
 }
 
 func (e *emailValidator) Imports() []string {

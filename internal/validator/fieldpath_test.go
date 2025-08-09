@@ -69,7 +69,7 @@ func TestNewFieldPath(t *testing.T) {
 	}
 }
 
-func TestFieldPath_WithoutDots(t *testing.T) {
+func TestFieldPath_CleanedPath(t *testing.T) {
 	tests := []struct {
 		name      string
 		fieldPath validator.FieldPath
@@ -104,9 +104,9 @@ func TestFieldPath_WithoutDots(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := tt.fieldPath.WithoutDots()
+			got := tt.fieldPath.CleanedPath()
 			if got != tt.want {
-				t.Errorf("FieldPath.WithoutDots() = %v, want %v", got, tt.want)
+				t.Errorf("FieldPath.CleanedPath() = %v, want %v", got, tt.want)
 			}
 		})
 	}

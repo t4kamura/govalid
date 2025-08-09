@@ -39,7 +39,7 @@ func (m *minItemsValidator) FieldPath() validator.FieldPath {
 }
 
 func (m *minItemsValidator) Err() string {
-	key := fmt.Sprintf(minItemsKey, m.structName+m.FieldPath().WithoutDots())
+	key := fmt.Sprintf(minItemsKey, m.structName+m.FieldPath().CleanedPath())
 
 	if validator.GeneratorMemory[key] {
 		return ""
@@ -64,7 +64,7 @@ func (m *minItemsValidator) Err() string {
 }
 
 func (m *minItemsValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]MinItemsValidation", "[@PATH]", m.FieldPath().WithoutDots())
+	return strings.ReplaceAll("Err[@PATH]MinItemsValidation", "[@PATH]", m.FieldPath().CleanedPath())
 }
 
 func (m *minItemsValidator) Imports() []string {

@@ -37,7 +37,7 @@ func (m *numericValidator) FieldPath() validator.FieldPath {
 }
 
 func (m *numericValidator) Err() string {
-	key := fmt.Sprintf(numericKey, m.structName+m.FieldPath().WithoutDots())
+	key := fmt.Sprintf(numericKey, m.structName+m.FieldPath().CleanedPath())
 	if validator.GeneratorMemory[key] {
 		return ""
 	}
@@ -60,7 +60,7 @@ func (m *numericValidator) Err() string {
 }
 
 func (m *numericValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]NumericValidation", "[@PATH]", m.FieldPath().WithoutDots())
+	return strings.ReplaceAll("Err[@PATH]NumericValidation", "[@PATH]", m.FieldPath().CleanedPath())
 }
 
 func (m *numericValidator) Imports() []string {

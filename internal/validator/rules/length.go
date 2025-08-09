@@ -38,7 +38,7 @@ func (l *lengthValidator) FieldPath() validator.FieldPath {
 }
 
 func (l *lengthValidator) Err() string {
-	key := fmt.Sprintf(lengthKey, l.structName+l.FieldPath().WithoutDots())
+	key := fmt.Sprintf(lengthKey, l.structName+l.FieldPath().CleanedPath())
 
 	if validator.GeneratorMemory[key] {
 		return ""
@@ -63,7 +63,7 @@ func (l *lengthValidator) Err() string {
 }
 
 func (l *lengthValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]LengthValidation", "[@PATH]", l.FieldPath().WithoutDots())
+	return strings.ReplaceAll("Err[@PATH]LengthValidation", "[@PATH]", l.FieldPath().CleanedPath())
 }
 
 func (l *lengthValidator) Imports() []string {

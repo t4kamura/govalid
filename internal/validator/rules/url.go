@@ -39,7 +39,7 @@ func (u *urlValidator) FieldPath() validator.FieldPath {
 
 func (u *urlValidator) Err() string {
 	// No need to generate inline function - using external helper
-	key := fmt.Sprintf(urlKey, u.structName+u.FieldPath().WithoutDots())
+	key := fmt.Sprintf(urlKey, u.structName+u.FieldPath().CleanedPath())
 	if validator.GeneratorMemory[key] {
 		return ""
 	}
@@ -62,7 +62,7 @@ func (u *urlValidator) Err() string {
 }
 
 func (u *urlValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]URLValidation", `[@PATH]`, u.FieldPath().WithoutDots())
+	return strings.ReplaceAll("Err[@PATH]URLValidation", `[@PATH]`, u.FieldPath().CleanedPath())
 }
 
 func (u *urlValidator) Imports() []string {

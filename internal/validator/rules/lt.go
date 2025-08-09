@@ -39,7 +39,7 @@ func (m *ltValidator) FieldPath() validator.FieldPath {
 }
 
 func (m *ltValidator) Err() string {
-	key := fmt.Sprintf(ltKey, m.structName+m.FieldPath().WithoutDots())
+	key := fmt.Sprintf(ltKey, m.structName+m.FieldPath().CleanedPath())
 
 	if validator.GeneratorMemory[key] {
 		return ""
@@ -64,7 +64,7 @@ func (m *ltValidator) Err() string {
 }
 
 func (m *ltValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]LTValidation", "[@PATH]", m.FieldPath().WithoutDots())
+	return strings.ReplaceAll("Err[@PATH]LTValidation", "[@PATH]", m.FieldPath().CleanedPath())
 }
 
 func (m *ltValidator) Imports() []string {

@@ -39,7 +39,7 @@ func (m *maxItemsValidator) FieldPath() validator.FieldPath {
 }
 
 func (m *maxItemsValidator) Err() string {
-	key := fmt.Sprintf(maxItemsKey, m.structName+m.FieldPath().WithoutDots())
+	key := fmt.Sprintf(maxItemsKey, m.structName+m.FieldPath().CleanedPath())
 
 	if validator.GeneratorMemory[key] {
 		return ""
@@ -64,7 +64,7 @@ func (m *maxItemsValidator) Err() string {
 }
 
 func (m *maxItemsValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]MaxItemsValidation", "[@PATH]", m.FieldPath().WithoutDots())
+	return strings.ReplaceAll("Err[@PATH]MaxItemsValidation", "[@PATH]", m.FieldPath().CleanedPath())
 }
 
 func (m *maxItemsValidator) Imports() []string {

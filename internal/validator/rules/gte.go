@@ -39,7 +39,7 @@ func (m *gteValidator) FieldPath() validator.FieldPath {
 }
 
 func (m *gteValidator) Err() string {
-	key := fmt.Sprintf(gteKey, m.structName+m.FieldPath().WithoutDots())
+	key := fmt.Sprintf(gteKey, m.structName+m.FieldPath().CleanedPath())
 
 	if validator.GeneratorMemory[key] {
 		return ""
@@ -64,7 +64,7 @@ func (m *gteValidator) Err() string {
 }
 
 func (m *gteValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]GTEValidation", "[@PATH]", m.FieldPath().WithoutDots())
+	return strings.ReplaceAll("Err[@PATH]GTEValidation", "[@PATH]", m.FieldPath().CleanedPath())
 }
 
 func (m *gteValidator) Imports() []string {

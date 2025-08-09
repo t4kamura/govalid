@@ -73,7 +73,7 @@ func (m *numericValidator) Imports() []string {
 func ValidateNumeric(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName string, parentPath string) validator.Validator {
 	fieldPath := validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
 	validator.GeneratorMemory[fmt.Sprintf(numericKey, structName+fieldPath.WithoutDots())] = false
-	
+
 	typ := pass.TypesInfo.TypeOf(field.Type)
 
 	// Check if it's a string type

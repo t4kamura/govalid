@@ -16,6 +16,7 @@ type alphaValidator struct {
 	field      *ast.Field
 	structName string
 	ruleName   string
+	parentPath string
 }
 
 var _ validator.Validator = (*alphaValidator)(nil)
@@ -31,12 +32,21 @@ func (v *alphaValidator) FieldName() string {
 	return v.field.Names[0].Name
 }
 
+func (v *alphaValidator) FieldPath() validator.FieldPath {
+	if v.parentPath == "" {
+		return validator.NewFieldPath(v.structName, v.FieldName())
+	}
+	return validator.NewFieldPath(v.structName, v.parentPath, v.FieldName())
+}
+
 func (v *alphaValidator) Err() string {
-	if validator.GeneratorMemory[fmt.Sprintf(alphaKey, v.FieldName())] {
+	key := fmt.Sprintf(alphaKey, v.FieldPath().WithoutDots())
+	
+	if validator.GeneratorMemory[key] {
 		return ""
 	}
 
-	validator.GeneratorMemory[fmt.Sprintf(alphaKey, v.FieldName())] = true
+	validator.GeneratorMemory[key] = true
 
 	const errTemplate = `
 		// [@ERRVARIABLE] is the error returned when field [@FIELD] is not alphabetic.
@@ -46,7 +56,7 @@ func (v *alphaValidator) Err() string {
 	replacer := strings.NewReplacer(
 		"[@ERRVARIABLE]", v.ErrVariable(),
 		"[@FIELD]", v.FieldName(),
-		"[@PATH]", fmt.Sprintf("%s.%s", v.structName, v.structName+v.FieldName()),
+		"[@PATH]", v.FieldPath().String(),
 		"[@TYPE]", v.ruleName,
 	)
 
@@ -54,7 +64,7 @@ func (v *alphaValidator) Err() string {
 }
 
 func (v *alphaValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]AlphaValidation", "[@PATH]", v.structName+v.FieldName())
+	return strings.ReplaceAll("Err[@PATH]AlphaValidation", "[@PATH]", v.FieldPath().WithoutDots())
 }
 
 func (v *alphaValidator) Imports() []string {
@@ -63,7 +73,16 @@ func (v *alphaValidator) Imports() []string {
 }
 
 // ValidateAlpha creates a new alphaValidator for string types.
-func ValidateAlpha(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName string) validator.Validator {
+func ValidateAlpha(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+	fieldName := field.Names[0].Name
+	var fieldPath validator.FieldPath
+	if parentPath != "" {
+		fieldPath = validator.NewFieldPath(structName, parentPath, fieldName)
+	} else {
+		fieldPath = validator.NewFieldPath(structName, fieldName)
+	}
+	validator.GeneratorMemory[fmt.Sprintf(alphaKey, fieldPath.WithoutDots())] = false
+	
 	typ := pass.TypesInfo.TypeOf(field.Type)
 
 	// Check if it's a string type
@@ -78,5 +97,6 @@ func ValidateAlpha(pass *codegen.Pass, field *ast.Field, _ map[string]string, st
 		field:      field,
 		structName: structName,
 		ruleName:   ruleName,
+		parentPath: parentPath,
 	}
 }

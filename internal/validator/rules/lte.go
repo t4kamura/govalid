@@ -19,6 +19,7 @@ type lteValidator struct {
 	lteValue   string
 	structName string
 	ruleName   string
+	parentPath string
 }
 
 var _ validator.Validator = (*lteValidator)(nil)
@@ -33,8 +34,15 @@ func (m *lteValidator) FieldName() string {
 	return m.field.Names[0].Name
 }
 
+func (m *lteValidator) FieldPath() validator.FieldPath {
+	if m.parentPath == "" {
+		return validator.NewFieldPath(m.structName, m.FieldName())
+	}
+	return validator.NewFieldPath(m.structName, m.parentPath, m.FieldName())
+}
+
 func (m *lteValidator) Err() string {
-	key := fmt.Sprintf(lteKey, m.structName+m.FieldName())
+	key := fmt.Sprintf(lteKey, m.structName+m.FieldPath().WithoutDots())
 
 	if validator.GeneratorMemory[key] {
 		return ""
@@ -50,8 +58,8 @@ func (m *lteValidator) Err() string {
 	replacer := strings.NewReplacer(
 		"[@ERRVARIABLE]", m.ErrVariable(),
 		"[@FIELD]", m.FieldName(),
+		"[@PATH]", m.FieldPath().String(),
 		"[@VALUE]", m.lteValue,
-		"[@PATH]", fmt.Sprintf("%s.%s", m.structName, m.FieldName()),
 		"[@TYPE]", m.ruleName,
 	)
 
@@ -59,7 +67,7 @@ func (m *lteValidator) Err() string {
 }
 
 func (m *lteValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]LTEValidation", "[@PATH]", m.structName+m.FieldName())
+	return strings.ReplaceAll("Err[@PATH]LTEValidation", "[@PATH]", m.FieldPath().WithoutDots())
 }
 
 func (m *lteValidator) Imports() []string {
@@ -67,7 +75,13 @@ func (m *lteValidator) Imports() []string {
 }
 
 // ValidateLTE creates a new lteValidator if the field type is numeric and the lte marker is present.
-func ValidateLTE(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string) validator.Validator {
+func ValidateLTE(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+	fieldPath := validator.NewFieldPath(structName, field.Names[0].Name)
+	if parentPath != "" {
+		fieldPath = validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
+	}
+	validator.GeneratorMemory[fmt.Sprintf(lteKey, structName+fieldPath.WithoutDots())] = false
+	
 	typ := pass.TypesInfo.TypeOf(field.Type)
 	basic, ok := typ.Underlying().(*types.Basic)
 
@@ -86,5 +100,6 @@ func ValidateLTE(pass *codegen.Pass, field *ast.Field, expressions map[string]st
 		lteValue:   lteValue,
 		structName: structName,
 		ruleName:   ruleName,
+		parentPath: parentPath,
 	}
 }

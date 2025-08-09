@@ -18,6 +18,7 @@ type requiredValidator struct {
 	field      *ast.Field
 	structName string
 	ruleName   string
+	parentPath string
 }
 
 var _ validator.Validator = (*requiredValidator)(nil)
@@ -51,8 +52,15 @@ func (r *requiredValidator) FieldName() string {
 	return r.field.Names[0].Name
 }
 
+func (r *requiredValidator) FieldPath() validator.FieldPath {
+	if r.parentPath == "" {
+		return validator.NewFieldPath(r.structName, r.FieldName())
+	}
+	return validator.NewFieldPath(r.structName, r.parentPath, r.FieldName())
+}
+
 func (r *requiredValidator) Err() string {
-	key := fmt.Sprintf(requiredKey, r.structName+r.FieldName())
+	key := fmt.Sprintf(requiredKey, r.FieldPath().WithoutDots())
 
 	if validator.GeneratorMemory[key] {
 		return ""
@@ -68,7 +76,7 @@ func (r *requiredValidator) Err() string {
 	replacer := strings.NewReplacer(
 		"[@ERRVARIABLE]", r.ErrVariable(),
 		"[@FIELD]", r.FieldName(),
-		"[@PATH]", fmt.Sprintf("%s.%s", r.structName, r.FieldName()),
+		"[@PATH]", r.FieldPath().String(),
 		"[@TYPE]", r.ruleName,
 	)
 
@@ -76,7 +84,7 @@ func (r *requiredValidator) Err() string {
 }
 
 func (r *requiredValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]RequiredValidation", "[@PATH]", r.structName+r.FieldName())
+	return strings.ReplaceAll("Err[@PATH]RequiredValidation", "[@PATH]", r.FieldPath().WithoutDots())
 }
 
 func (r *requiredValidator) Imports() []string {
@@ -84,13 +92,21 @@ func (r *requiredValidator) Imports() []string {
 }
 
 // ValidateRequired creates a new required validator for the given field.
-func ValidateRequired(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName string) validator.Validator {
-	validator.GeneratorMemory[fmt.Sprintf(requiredKey, structName+field.Names[0].Name)] = false
+func ValidateRequired(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+	fieldName := field.Names[0].Name
+	var fieldPath validator.FieldPath
+	if parentPath != "" {
+		fieldPath = validator.NewFieldPath(structName, parentPath, fieldName)
+	} else {
+		fieldPath = validator.NewFieldPath(structName, fieldName)
+	}
+	validator.GeneratorMemory[fmt.Sprintf(requiredKey, fieldPath.WithoutDots())] = false
 
 	return &requiredValidator{
 		pass:       pass,
 		field:      field,
 		structName: structName,
 		ruleName:   ruleName,
+		parentPath: parentPath,
 	}
 }

@@ -72,10 +72,6 @@ func (e *emailValidator) Imports() []string {
 
 // ValidateEmail creates a new emailValidator for string types.
 func ValidateEmail(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName, parentPath string) validator.Validator {
-	fieldName := field.Names[0].Name
-	fieldPath := validator.NewFieldPath(structName, parentPath, fieldName)
-	validator.GeneratorMemory[fmt.Sprintf(emailKey, fieldPath.WithoutDots())] = false
-
 	typ := pass.TypesInfo.TypeOf(field.Type)
 
 	// Check if it's a string type

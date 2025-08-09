@@ -71,9 +71,6 @@ func (u *urlValidator) Imports() []string {
 
 // ValidateURL creates a new urlValidator for string types.
 func ValidateURL(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName, parentPath string) validator.Validator {
-	fieldPath := validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
-	validator.GeneratorMemory[fmt.Sprintf(urlKey, structName+fieldPath.WithoutDots())] = false
-
 	typ := pass.TypesInfo.TypeOf(field.Type)
 
 	// Check if it's a string type

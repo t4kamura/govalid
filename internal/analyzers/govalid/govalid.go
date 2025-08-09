@@ -131,7 +131,7 @@ func analyzeMarker(pass *codegen.Pass, markersInspect markers.Markers, structTyp
 		// Traverse nested structs
 		structType, ok := field.Type.(*ast.StructType)
 		if !ok {
-			validators = makeValidator(pass, markerSet, field, structName)
+			validators = makeValidator(pass, markerSet, field, structName, parent)
 			if len(validators) == 0 {
 				continue
 			}
@@ -153,7 +153,7 @@ func analyzeMarker(pass *codegen.Pass, markersInspect markers.Markers, structTyp
 					Name string `json:"name"`
 				}
 			*/
-			validators = append(validators, makeValidator(pass, markerSet, field, structName)...)
+			validators = append(validators, makeValidator(pass, markerSet, field, structName, parent)...)
 		}
 
 		// Add the parent variable name to the analyzed metadata
@@ -178,7 +178,7 @@ func analyzeMarker(pass *codegen.Pass, markersInspect markers.Markers, structTyp
 	return analyzed
 }
 
-func makeValidator(pass *codegen.Pass, markers markers.MarkerSet, field *ast.Field, structName string) []validator.Validator {
+func makeValidator(pass *codegen.Pass, markers markers.MarkerSet, field *ast.Field, structName string, parentPath string) []validator.Validator {
 	validators := make([]validator.Validator, 0)
 
 	for _, marker := range markers {
@@ -190,7 +190,7 @@ func makeValidator(pass *codegen.Pass, markers markers.MarkerSet, field *ast.Fie
 
 		ruleName := strings.TrimPrefix(marker.Identifier, "govalid:")
 
-		v := factory(pass, field, marker.Expressions, structName, ruleName)
+		v := factory(pass, field, marker.Expressions, structName, ruleName, parentPath)
 		if v == nil {
 			continue
 		}

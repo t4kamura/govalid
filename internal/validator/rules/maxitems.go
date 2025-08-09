@@ -11,6 +11,7 @@ import (
 
 	"github.com/sivchari/govalid/internal/markers"
 	"github.com/sivchari/govalid/internal/validator"
+	"github.com/sivchari/govalid/internal/validator/registry"
 )
 
 type maxItemsValidator struct {
@@ -72,8 +73,8 @@ func (m *maxItemsValidator) Imports() []string {
 }
 
 // ValidateMaxItems creates a new maxItemsValidator if the field type supports len() and the maxitems marker is present.
-func ValidateMaxItems(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName, parentPath string) validator.Validator {
-	typ := pass.TypesInfo.TypeOf(field.Type)
+func ValidateMaxItems(input registry.ValidatorInput) validator.Validator {
+	typ := input.Pass.TypesInfo.TypeOf(input.Field.Type)
 
 	// Check if it's a type that supports len() (exclude strings - use maxlength instead)
 	switch typ.Underlying().(type) {
@@ -83,17 +84,17 @@ func ValidateMaxItems(pass *codegen.Pass, field *ast.Field, expressions map[stri
 		return nil
 	}
 
-	maxItemsValue, ok := expressions[markers.GoValidMarkerMaxitems]
+	maxItemsValue, ok := input.Expressions[markers.GoValidMarkerMaxitems]
 	if !ok {
 		return nil
 	}
 
 	return &maxItemsValidator{
-		pass:          pass,
-		field:         field,
+		pass:          input.Pass,
+		field:         input.Field,
 		maxItemsValue: maxItemsValue,
-		structName:    structName,
-		ruleName:      ruleName,
-		parentPath:    parentPath,
+		structName:    input.StructName,
+		ruleName:      input.RuleName,
+		parentPath:    input.ParentPath,
 	}
 }

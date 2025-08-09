@@ -11,6 +11,7 @@ import (
 
 	"github.com/sivchari/govalid/internal/markers"
 	"github.com/sivchari/govalid/internal/validator"
+	"github.com/sivchari/govalid/internal/validator/registry"
 )
 
 type lteValidator struct {
@@ -72,25 +73,25 @@ func (m *lteValidator) Imports() []string {
 }
 
 // ValidateLTE creates a new lteValidator if the field type is numeric and the lte marker is present.
-func ValidateLTE(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName, parentPath string) validator.Validator {
-	typ := pass.TypesInfo.TypeOf(field.Type)
+func ValidateLTE(input registry.ValidatorInput) validator.Validator {
+	typ := input.Pass.TypesInfo.TypeOf(input.Field.Type)
 	basic, ok := typ.Underlying().(*types.Basic)
 
 	if !ok || (basic.Info()&types.IsNumeric) == 0 {
 		return nil
 	}
 
-	lteValue, ok := expressions[markers.GoValidMarkerLte]
+	lteValue, ok := input.Expressions[markers.GoValidMarkerLte]
 	if !ok {
 		return nil
 	}
 
 	return &lteValidator{
-		pass:       pass,
-		field:      field,
+		pass:       input.Pass,
+		field:      input.Field,
 		lteValue:   lteValue,
-		structName: structName,
-		ruleName:   ruleName,
-		parentPath: parentPath,
+		structName: input.StructName,
+		ruleName:   input.RuleName,
+		parentPath: input.ParentPath,
 	}
 }

@@ -10,6 +10,7 @@ import (
 
 	"github.com/sivchari/govalid/internal/markers"
 	"github.com/sivchari/govalid/internal/validator"
+	"github.com/sivchari/govalid/internal/validator/registry"
 )
 
 type lengthValidator struct {
@@ -71,25 +72,25 @@ func (l *lengthValidator) Imports() []string {
 }
 
 // ValidateLength creates a new lengthValidator if the field type is string and the length marker is present.
-func ValidateLength(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName, parentPath string) validator.Validator {
-	typ := pass.TypesInfo.TypeOf(field.Type)
+func ValidateLength(input registry.ValidatorInput) validator.Validator {
+	typ := input.Pass.TypesInfo.TypeOf(input.Field.Type)
 	basic, ok := typ.Underlying().(*types.Basic)
 
 	if !ok || basic.Kind() != types.String {
 		return nil
 	}
 
-	lengthValue, ok := expressions[markers.GoValidMarkerLength]
+	lengthValue, ok := input.Expressions[markers.GoValidMarkerLength]
 	if !ok {
 		return nil
 	}
 
 	return &lengthValidator{
-		pass:        pass,
-		field:       field,
+		pass:        input.Pass,
+		field:       input.Field,
 		lengthValue: lengthValue,
-		structName:  structName,
-		ruleName:    ruleName,
-		parentPath:  parentPath,
+		structName:  input.StructName,
+		ruleName:    input.RuleName,
+		parentPath:  input.ParentPath,
 	}
 }

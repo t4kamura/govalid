@@ -11,6 +11,7 @@ import (
 
 	"github.com/sivchari/govalid/internal/markers"
 	"github.com/sivchari/govalid/internal/validator"
+	"github.com/sivchari/govalid/internal/validator/registry"
 )
 
 type minLengthValidator struct {
@@ -72,25 +73,25 @@ func (m *minLengthValidator) Imports() []string {
 }
 
 // ValidateMinLength creates a new minLengthValidator if the field type is string and the minlength marker is present.
-func ValidateMinLength(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName, parentPath string) validator.Validator {
-	typ := pass.TypesInfo.TypeOf(field.Type)
+func ValidateMinLength(input registry.ValidatorInput) validator.Validator {
+	typ := input.Pass.TypesInfo.TypeOf(input.Field.Type)
 	basic, ok := typ.Underlying().(*types.Basic)
 
 	if !ok || basic.Kind() != types.String {
 		return nil
 	}
 
-	minLengthValue, ok := expressions[markers.GoValidMarkerMinlength]
+	minLengthValue, ok := input.Expressions[markers.GoValidMarkerMinlength]
 	if !ok {
 		return nil
 	}
 
 	return &minLengthValidator{
-		pass:           pass,
-		field:          field,
+		pass:           input.Pass,
+		field:          input.Field,
 		minLengthValue: minLengthValue,
-		structName:     structName,
-		ruleName:       ruleName,
-		parentPath:     parentPath,
+		structName:     input.StructName,
+		ruleName:       input.RuleName,
+		parentPath:     input.ParentPath,
 	}
 }

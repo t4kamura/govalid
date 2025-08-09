@@ -9,6 +9,7 @@ import (
 	"github.com/gostaticanalysis/codegen"
 
 	"github.com/sivchari/govalid/internal/validator"
+	"github.com/sivchari/govalid/internal/validator/registry"
 )
 
 type {{.MarkerName}}Validator struct {
@@ -71,12 +72,12 @@ func (v *{{.MarkerName}}Validator) Imports() []string {
 }
 
 // Validate{{.StructName}} creates a new {{.MarkerName}} validator for the given field.
-func Validate{{.StructName}}(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+func Validate{{.StructName}}(input registry.ValidatorInput) validator.Validator {
 	return &{{.MarkerName}}Validator{
-		pass:       pass,
-		field:      field,
-		structName: structName,
-		ruleName:   ruleName,
-		parentPath: parentPath,
+		pass:       input.Pass,
+		field:      input.Field,
+		structName: input.StructName,
+		ruleName:   input.RuleName,
+		parentPath: input.ParentPath,
 	}
 }

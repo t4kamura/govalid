@@ -13,6 +13,7 @@ import (
 
 	"github.com/sivchari/govalid/internal/markers"
 	"github.com/sivchari/govalid/internal/validator"
+	"github.com/sivchari/govalid/internal/validator/registry"
 )
 
 type celValidator struct {
@@ -138,8 +139,8 @@ func (c *celValidator) needsTimeImport() bool {
 
 // ValidateCEL creates a new celValidator for fields with CEL marker.
 // This validator supports all field types since CEL can handle various data types.
-func ValidateCEL(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName, parentPath string) validator.Validator {
-	celExpression, ok := expressions[markers.GoValidMarkerCel]
+func ValidateCEL(input registry.ValidatorInput) validator.Validator {
+	celExpression, ok := input.Expressions[markers.GoValidMarkerCel]
 	if !ok {
 		return nil
 	}
@@ -150,12 +151,12 @@ func ValidateCEL(pass *codegen.Pass, field *ast.Field, expressions map[string]st
 	}
 
 	return &celValidator{
-		pass:       pass,
-		field:      field,
+		pass:       input.Pass,
+		field:      input.Field,
 		expression: celExpression,
-		structName: structName,
-		ruleName:   ruleName,
-		parentPath: parentPath,
+		structName: input.StructName,
+		ruleName:   input.RuleName,
+		parentPath: input.ParentPath,
 	}
 }
 

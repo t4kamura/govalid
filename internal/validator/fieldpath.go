@@ -8,7 +8,7 @@ type FieldPath string
 
 // NewFieldPath creates a new FieldPath from the given components.
 func NewFieldPath(components ...string) FieldPath {
-	var nonEmpty []string
+	nonEmpty := make([]string, 0, len(components))
 
 	for _, component := range components {
 		if strings.TrimSpace(component) != "" {

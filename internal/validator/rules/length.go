@@ -74,7 +74,7 @@ func (l *lengthValidator) Imports() []string {
 func ValidateLength(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string, parentPath string) validator.Validator {
 	fieldPath := validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
 	validator.GeneratorMemory[fmt.Sprintf(lengthKey, structName+fieldPath.WithoutDots())] = false
-	
+
 	typ := pass.TypesInfo.TypeOf(field.Type)
 	basic, ok := typ.Underlying().(*types.Basic)
 

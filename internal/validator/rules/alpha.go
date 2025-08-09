@@ -38,7 +38,7 @@ func (v *alphaValidator) FieldPath() validator.FieldPath {
 
 func (v *alphaValidator) Err() string {
 	key := fmt.Sprintf(alphaKey, v.FieldPath().WithoutDots())
-	
+
 	if validator.GeneratorMemory[key] {
 		return ""
 	}
@@ -74,7 +74,7 @@ func ValidateAlpha(pass *codegen.Pass, field *ast.Field, _ map[string]string, st
 	fieldName := field.Names[0].Name
 	fieldPath := validator.NewFieldPath(structName, parentPath, fieldName)
 	validator.GeneratorMemory[fmt.Sprintf(alphaKey, fieldPath.WithoutDots())] = false
-	
+
 	typ := pass.TypesInfo.TypeOf(field.Type)
 
 	// Check if it's a string type

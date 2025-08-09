@@ -142,7 +142,7 @@ func ValidateCEL(pass *codegen.Pass, field *ast.Field, expressions map[string]st
 	fieldName := field.Names[0].Name
 	fieldPath := validator.NewFieldPath(structName, parentPath, fieldName)
 	validator.GeneratorMemory[fmt.Sprintf(celKey, fieldPath.WithoutDots())] = false
-	
+
 	celExpression, ok := expressions[markers.GoValidMarkerCel]
 	if !ok {
 		return nil

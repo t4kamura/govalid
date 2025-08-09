@@ -19,6 +19,7 @@ type ltValidator struct {
 	ltValue    string
 	structName string
 	ruleName   string
+	parentPath string
 }
 
 var _ validator.Validator = (*ltValidator)(nil)
@@ -33,8 +34,15 @@ func (m *ltValidator) FieldName() string {
 	return m.field.Names[0].Name
 }
 
+func (m *ltValidator) FieldPath() validator.FieldPath {
+	if m.parentPath == "" {
+		return validator.NewFieldPath(m.structName, m.FieldName())
+	}
+	return validator.NewFieldPath(m.structName, m.parentPath, m.FieldName())
+}
+
 func (m *ltValidator) Err() string {
-	key := fmt.Sprintf(ltKey, m.structName+m.FieldName())
+	key := fmt.Sprintf(ltKey, m.structName+m.FieldPath().WithoutDots())
 
 	if validator.GeneratorMemory[key] {
 		return ""
@@ -50,8 +58,8 @@ func (m *ltValidator) Err() string {
 	replacer := strings.NewReplacer(
 		"[@ERRVARIABLE]", m.ErrVariable(),
 		"[@FIELD]", m.FieldName(),
+		"[@PATH]", m.FieldPath().String(),
 		"[@VALUE]", m.ltValue,
-		"[@PATH]", fmt.Sprintf("%s.%s", m.structName, m.FieldName()),
 		"[@TYPE]", m.ruleName,
 	)
 
@@ -59,7 +67,7 @@ func (m *ltValidator) Err() string {
 }
 
 func (m *ltValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]LTValidation", "[@PATH]", m.structName+m.FieldName())
+	return strings.ReplaceAll("Err[@PATH]LTValidation", "[@PATH]", m.FieldPath().WithoutDots())
 }
 
 func (m *ltValidator) Imports() []string {
@@ -67,7 +75,13 @@ func (m *ltValidator) Imports() []string {
 }
 
 // ValidateLT creates a new ltValidator if the field type is numeric and the min marker is present.
-func ValidateLT(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string) validator.Validator {
+func ValidateLT(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+	fieldPath := validator.NewFieldPath(structName, field.Names[0].Name)
+	if parentPath != "" {
+		fieldPath = validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
+	}
+	validator.GeneratorMemory[fmt.Sprintf(ltKey, structName+fieldPath.WithoutDots())] = false
+	
 	typ := pass.TypesInfo.TypeOf(field.Type)
 	basic, ok := typ.Underlying().(*types.Basic)
 
@@ -86,5 +100,6 @@ func ValidateLT(pass *codegen.Pass, field *ast.Field, expressions map[string]str
 		ltValue:    ltValue,
 		structName: structName,
 		ruleName:   ruleName,
+		parentPath: parentPath,
 	}
 }

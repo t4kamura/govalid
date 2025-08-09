@@ -18,6 +18,7 @@ type lengthValidator struct {
 	lengthValue string
 	structName  string
 	ruleName    string
+	parentPath  string
 }
 
 var _ validator.Validator = (*lengthValidator)(nil)
@@ -32,8 +33,15 @@ func (l *lengthValidator) FieldName() string {
 	return l.field.Names[0].Name
 }
 
+func (l *lengthValidator) FieldPath() validator.FieldPath {
+	if l.parentPath == "" {
+		return validator.NewFieldPath(l.structName, l.FieldName())
+	}
+	return validator.NewFieldPath(l.structName, l.parentPath, l.FieldName())
+}
+
 func (l *lengthValidator) Err() string {
-	key := fmt.Sprintf(lengthKey, l.structName+l.FieldName())
+	key := fmt.Sprintf(lengthKey, l.structName+l.FieldPath().WithoutDots())
 
 	if validator.GeneratorMemory[key] {
 		return ""
@@ -49,7 +57,7 @@ func (l *lengthValidator) Err() string {
 	replacer := strings.NewReplacer(
 		"[@ERRVARIABLE]", l.ErrVariable(),
 		"[@FIELD]", l.FieldName(),
-		"[@PATH]", fmt.Sprintf("%s.%s", l.structName, l.FieldName()),
+		"[@PATH]", l.FieldPath().String(),
 		"[@VALUE]", l.lengthValue,
 		"[@TYPE]", l.ruleName,
 	)
@@ -58,7 +66,7 @@ func (l *lengthValidator) Err() string {
 }
 
 func (l *lengthValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]LengthValidation", "[@PATH]", l.structName+l.FieldName())
+	return strings.ReplaceAll("Err[@PATH]LengthValidation", "[@PATH]", l.FieldPath().WithoutDots())
 }
 
 func (l *lengthValidator) Imports() []string {
@@ -66,7 +74,13 @@ func (l *lengthValidator) Imports() []string {
 }
 
 // ValidateLength creates a new lengthValidator if the field type is string and the length marker is present.
-func ValidateLength(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string) validator.Validator {
+func ValidateLength(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+	fieldPath := validator.NewFieldPath(structName, field.Names[0].Name)
+	if parentPath != "" {
+		fieldPath = validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
+	}
+	validator.GeneratorMemory[fmt.Sprintf(lengthKey, structName+fieldPath.WithoutDots())] = false
+	
 	typ := pass.TypesInfo.TypeOf(field.Type)
 	basic, ok := typ.Underlying().(*types.Basic)
 
@@ -85,5 +99,6 @@ func ValidateLength(pass *codegen.Pass, field *ast.Field, expressions map[string
 		lengthValue: lengthValue,
 		structName:  structName,
 		ruleName:    ruleName,
+		parentPath:  parentPath,
 	}
 }

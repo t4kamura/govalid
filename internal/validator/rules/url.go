@@ -16,6 +16,7 @@ type urlValidator struct {
 	field      *ast.Field
 	structName string
 	ruleName   string
+	parentPath string
 }
 
 var _ validator.Validator = (*urlValidator)(nil)
@@ -32,11 +33,16 @@ func (u *urlValidator) FieldName() string {
 	return u.field.Names[0].Name
 }
 
-func (u *urlValidator) Err() string {
-	fieldName := u.FieldName()
+func (u *urlValidator) FieldPath() validator.FieldPath {
+	if u.parentPath == "" {
+		return validator.NewFieldPath(u.structName, u.FieldName())
+	}
+	return validator.NewFieldPath(u.structName, u.parentPath, u.FieldName())
+}
 
+func (u *urlValidator) Err() string {
 	// No need to generate inline function - using external helper
-	key := fmt.Sprintf(urlKey, u.structName+fieldName)
+	key := fmt.Sprintf(urlKey, u.structName+u.FieldPath().WithoutDots())
 	if validator.GeneratorMemory[key] {
 		return ""
 	}
@@ -50,8 +56,8 @@ func (u *urlValidator) Err() string {
 
 	replacer := strings.NewReplacer(
 		"[@ERRVARIABLE]", u.ErrVariable(),
-		"[@FIELD]", fieldName,
-		"[@PATH]", fmt.Sprintf("%s.%s", u.structName, fieldName),
+		"[@FIELD]", u.FieldName(),
+		"[@PATH]", u.FieldPath().String(),
 		"[@TYPE]", u.ruleName,
 	)
 
@@ -59,7 +65,7 @@ func (u *urlValidator) Err() string {
 }
 
 func (u *urlValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]URLValidation", `[@PATH]`, u.structName+u.FieldName())
+	return strings.ReplaceAll("Err[@PATH]URLValidation", `[@PATH]`, u.FieldPath().WithoutDots())
 }
 
 func (u *urlValidator) Imports() []string {
@@ -67,7 +73,13 @@ func (u *urlValidator) Imports() []string {
 }
 
 // ValidateURL creates a new urlValidator for string types.
-func ValidateURL(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName string) validator.Validator {
+func ValidateURL(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+	fieldPath := validator.NewFieldPath(structName, field.Names[0].Name)
+	if parentPath != "" {
+		fieldPath = validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
+	}
+	validator.GeneratorMemory[fmt.Sprintf(urlKey, structName+fieldPath.WithoutDots())] = false
+	
 	typ := pass.TypesInfo.TypeOf(field.Type)
 
 	// Check if it's a string type
@@ -81,5 +93,6 @@ func ValidateURL(pass *codegen.Pass, field *ast.Field, _ map[string]string, stru
 		field:      field,
 		structName: structName,
 		ruleName:   ruleName,
+		parentPath: parentPath,
 	}
 }

@@ -19,6 +19,7 @@ type gtValidator struct {
 	gtValue    string
 	structName string
 	ruleName   string
+	parentPath string
 }
 
 var _ validator.Validator = (*gtValidator)(nil)
@@ -33,8 +34,15 @@ func (m *gtValidator) FieldName() string {
 	return m.field.Names[0].Name
 }
 
+func (m *gtValidator) FieldPath() validator.FieldPath {
+	if m.parentPath == "" {
+		return validator.NewFieldPath(m.structName, m.FieldName())
+	}
+	return validator.NewFieldPath(m.structName, m.parentPath, m.FieldName())
+}
+
 func (m *gtValidator) Err() string {
-	key := fmt.Sprintf(gtKey, m.structName+m.FieldName())
+	key := fmt.Sprintf(gtKey, m.structName+m.FieldPath().WithoutDots())
 
 	if validator.GeneratorMemory[key] {
 		return ""
@@ -50,7 +58,7 @@ func (m *gtValidator) Err() string {
 	replacer := strings.NewReplacer(
 		"[@ERRVARIABLE]", m.ErrVariable(),
 		"[@FIELD]", m.FieldName(),
-		"[@PATH]", fmt.Sprintf("%s.%s", m.structName, m.FieldName()),
+		"[@PATH]", m.FieldPath().String(),
 		"[@VALUE]", m.gtValue,
 		"[@TYPE]", m.ruleName,
 	)
@@ -59,7 +67,7 @@ func (m *gtValidator) Err() string {
 }
 
 func (m *gtValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]GTValidation", "[@PATH]", m.structName+m.FieldName())
+	return strings.ReplaceAll("Err[@PATH]GTValidation", "[@PATH]", m.FieldPath().WithoutDots())
 }
 
 func (m *gtValidator) Imports() []string {
@@ -67,7 +75,13 @@ func (m *gtValidator) Imports() []string {
 }
 
 // ValidateGT creates a new gtValidator if the field type is numeric and the max marker is present.
-func ValidateGT(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string) validator.Validator {
+func ValidateGT(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+	fieldPath := validator.NewFieldPath(structName, field.Names[0].Name)
+	if parentPath != "" {
+		fieldPath = validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
+	}
+	validator.GeneratorMemory[fmt.Sprintf(gtKey, structName+fieldPath.WithoutDots())] = false
+	
 	typ := pass.TypesInfo.TypeOf(field.Type)
 	basic, ok := typ.Underlying().(*types.Basic)
 
@@ -86,5 +100,6 @@ func ValidateGT(pass *codegen.Pass, field *ast.Field, expressions map[string]str
 		gtValue:    gtValue,
 		structName: structName,
 		ruleName:   ruleName,
+		parentPath: parentPath,
 	}
 }

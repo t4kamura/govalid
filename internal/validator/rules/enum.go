@@ -22,6 +22,7 @@ type enumValidator struct {
 	isCustom   bool
 	structName string
 	ruleName   string
+	parentPath string
 }
 
 var _ validator.Validator = (*enumValidator)(nil)
@@ -50,8 +51,15 @@ func (e *enumValidator) FieldName() string {
 	return e.field.Names[0].Name
 }
 
+func (e *enumValidator) FieldPath() validator.FieldPath {
+	if e.parentPath == "" {
+		return validator.NewFieldPath(e.structName, e.FieldName())
+	}
+	return validator.NewFieldPath(e.structName, e.parentPath, e.FieldName())
+}
+
 func (e *enumValidator) Err() string {
-	key := fmt.Sprintf(enumKey, e.structName+e.FieldName())
+	key := fmt.Sprintf(enumKey, e.structName+e.FieldPath().WithoutDots())
 
 	if validator.GeneratorMemory[key] {
 		return ""
@@ -69,7 +77,7 @@ func (e *enumValidator) Err() string {
 	replacer := strings.NewReplacer(
 		"[@ERRVARIABLE]", e.ErrVariable(),
 		"[@FIELD]", e.FieldName(),
-		"[@PATH]", fmt.Sprintf("%s.%s", e.structName, e.FieldName()),
+		"[@PATH]", e.FieldPath().String(),
 		"[@ENUM_LIST]", enumList,
 		"[@TYPE]", e.ruleName,
 	)
@@ -78,7 +86,7 @@ func (e *enumValidator) Err() string {
 }
 
 func (e *enumValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]EnumValidation", "[@PATH]", e.structName+e.FieldName())
+	return strings.ReplaceAll("Err[@PATH]EnumValidation", "[@PATH]", e.FieldPath().WithoutDots())
 }
 
 func (e *enumValidator) Imports() []string {
@@ -86,7 +94,13 @@ func (e *enumValidator) Imports() []string {
 }
 
 // ValidateEnum creates a new enumValidator for string, numeric, and custom types.
-func ValidateEnum(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string) validator.Validator {
+func ValidateEnum(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+	fieldPath := validator.NewFieldPath(structName, field.Names[0].Name)
+	if parentPath != "" {
+		fieldPath = validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
+	}
+	validator.GeneratorMemory[fmt.Sprintf(enumKey, structName+fieldPath.WithoutDots())] = false
+	
 	typ := pass.TypesInfo.TypeOf(field.Type)
 
 	enumValue, ok := expressions[markers.GoValidMarkerEnum]
@@ -110,6 +124,7 @@ func ValidateEnum(pass *codegen.Pass, field *ast.Field, expressions map[string]s
 		enumValues: enumValues,
 		structName: structName,
 		ruleName:   ruleName,
+		parentPath: parentPath,
 	}
 
 	// Determine the type and set appropriate flags

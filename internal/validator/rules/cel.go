@@ -21,6 +21,7 @@ type celValidator struct {
 	expression string
 	structName string
 	ruleName   string
+	parentPath string
 }
 
 var _ validator.Validator = (*celValidator)(nil)
@@ -49,9 +50,15 @@ func (c *celValidator) FieldName() string {
 	return c.field.Names[0].Name
 }
 
+func (c *celValidator) FieldPath() validator.FieldPath {
+	if c.parentPath == "" {
+		return validator.NewFieldPath(c.structName, c.FieldName())
+	}
+	return validator.NewFieldPath(c.structName, c.parentPath, c.FieldName())
+}
+
 func (c *celValidator) Err() string {
-	fieldName := c.FieldName()
-	key := fmt.Sprintf(celKey, c.structName+fieldName)
+	key := fmt.Sprintf(celKey, c.FieldPath().WithoutDots())
 
 	if validator.GeneratorMemory[key] {
 		return ""
@@ -66,8 +73,8 @@ func (c *celValidator) Err() string {
 
 	replacer := strings.NewReplacer(
 		"[@ERRVARIABLE]", c.ErrVariable(),
-		"[@FIELD]", fieldName,
-		"[@PATH]", fmt.Sprintf("%s.%s", c.structName, fieldName),
+		"[@FIELD]", c.FieldName(),
+		"[@PATH]", c.FieldPath().String(),
 		"[@EXPRESSION]", c.expression,
 		"[@TYPE]", c.ruleName,
 	)
@@ -76,7 +83,7 @@ func (c *celValidator) Err() string {
 }
 
 func (c *celValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]CELValidation", "[@PATH]", c.structName+c.FieldName())
+	return strings.ReplaceAll("Err[@PATH]CELValidation", "[@PATH]", c.FieldPath().WithoutDots())
 }
 
 func (c *celValidator) Imports() []string {
@@ -134,7 +141,16 @@ func (c *celValidator) needsTimeImport() bool {
 
 // ValidateCEL creates a new celValidator for fields with CEL marker.
 // This validator supports all field types since CEL can handle various data types.
-func ValidateCEL(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string) validator.Validator {
+func ValidateCEL(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+	fieldName := field.Names[0].Name
+	var fieldPath validator.FieldPath
+	if parentPath != "" {
+		fieldPath = validator.NewFieldPath(structName, parentPath, fieldName)
+	} else {
+		fieldPath = validator.NewFieldPath(structName, fieldName)
+	}
+	validator.GeneratorMemory[fmt.Sprintf(celKey, fieldPath.WithoutDots())] = false
+	
 	celExpression, ok := expressions[markers.GoValidMarkerCel]
 	if !ok {
 		return nil
@@ -151,6 +167,7 @@ func ValidateCEL(pass *codegen.Pass, field *ast.Field, expressions map[string]st
 		expression: celExpression,
 		structName: structName,
 		ruleName:   ruleName,
+		parentPath: parentPath,
 	}
 }
 

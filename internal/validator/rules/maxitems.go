@@ -19,6 +19,7 @@ type maxItemsValidator struct {
 	maxItemsValue string
 	structName    string
 	ruleName      string
+	parentPath    string
 }
 
 var _ validator.Validator = (*maxItemsValidator)(nil)
@@ -33,8 +34,15 @@ func (m *maxItemsValidator) FieldName() string {
 	return m.field.Names[0].Name
 }
 
+func (m *maxItemsValidator) FieldPath() validator.FieldPath {
+	if m.parentPath == "" {
+		return validator.NewFieldPath(m.structName, m.FieldName())
+	}
+	return validator.NewFieldPath(m.structName, m.parentPath, m.FieldName())
+}
+
 func (m *maxItemsValidator) Err() string {
-	key := fmt.Sprintf(maxItemsKey, m.structName+m.FieldName())
+	key := fmt.Sprintf(maxItemsKey, m.structName+m.FieldPath().WithoutDots())
 
 	if validator.GeneratorMemory[key] {
 		return ""
@@ -50,7 +58,7 @@ func (m *maxItemsValidator) Err() string {
 	replacer := strings.NewReplacer(
 		"[@ERRVARIABLE]", m.ErrVariable(),
 		"[@FIELD]", m.FieldName(),
-		"[@PATH]", fmt.Sprintf("%s.%s", m.structName, m.FieldName()),
+		"[@PATH]", m.FieldPath().String(),
 		"[@VALUE]", m.maxItemsValue,
 		"[@TYPE]", m.ruleName,
 	)
@@ -59,7 +67,7 @@ func (m *maxItemsValidator) Err() string {
 }
 
 func (m *maxItemsValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]MaxItemsValidation", "[@PATH]", m.structName+m.FieldName())
+	return strings.ReplaceAll("Err[@PATH]MaxItemsValidation", "[@PATH]", m.FieldPath().WithoutDots())
 }
 
 func (m *maxItemsValidator) Imports() []string {
@@ -67,7 +75,13 @@ func (m *maxItemsValidator) Imports() []string {
 }
 
 // ValidateMaxItems creates a new maxItemsValidator if the field type supports len() and the maxitems marker is present.
-func ValidateMaxItems(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string) validator.Validator {
+func ValidateMaxItems(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+	fieldPath := validator.NewFieldPath(structName, field.Names[0].Name)
+	if parentPath != "" {
+		fieldPath = validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
+	}
+	validator.GeneratorMemory[fmt.Sprintf(maxItemsKey, structName+fieldPath.WithoutDots())] = false
+	
 	typ := pass.TypesInfo.TypeOf(field.Type)
 
 	// Check if it's a type that supports len() (exclude strings - use maxlength instead)
@@ -89,5 +103,6 @@ func ValidateMaxItems(pass *codegen.Pass, field *ast.Field, expressions map[stri
 		maxItemsValue: maxItemsValue,
 		structName:    structName,
 		ruleName:      ruleName,
+		parentPath:    parentPath,
 	}
 }

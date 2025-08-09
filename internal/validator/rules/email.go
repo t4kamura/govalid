@@ -17,6 +17,7 @@ type emailValidator struct {
 	field      *ast.Field
 	structName string
 	ruleName   string
+	parentPath string
 }
 
 var _ validator.Validator = (*emailValidator)(nil)
@@ -33,11 +34,16 @@ func (e *emailValidator) FieldName() string {
 	return e.field.Names[0].Name
 }
 
-func (e *emailValidator) Err() string {
-	fieldName := e.FieldName()
+func (e *emailValidator) FieldPath() validator.FieldPath {
+	if e.parentPath == "" {
+		return validator.NewFieldPath(e.structName, e.FieldName())
+	}
+	return validator.NewFieldPath(e.structName, e.parentPath, e.FieldName())
+}
 
+func (e *emailValidator) Err() string {
 	// No need to generate inline function - using external helper
-	key := fmt.Sprintf(emailKey, e.structName+fieldName)
+	key := fmt.Sprintf(emailKey, e.FieldPath().WithoutDots())
 	if validator.GeneratorMemory[key] {
 		return ""
 	}
@@ -51,8 +57,8 @@ func (e *emailValidator) Err() string {
 
 	replacer := strings.NewReplacer(
 		"[@ERRVARIABLE]", e.ErrVariable(),
-		"[@FIELD]", fieldName,
-		"[@PATH]", fmt.Sprintf("%s.%s", e.structName, fieldName),
+		"[@FIELD]", e.FieldName(),
+		"[@PATH]", e.FieldPath().String(),
 		"[@TYPE]", e.ruleName,
 	)
 
@@ -60,7 +66,7 @@ func (e *emailValidator) Err() string {
 }
 
 func (e *emailValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]EmailValidation", `[@PATH]`, e.structName+e.FieldName())
+	return strings.ReplaceAll("Err[@PATH]EmailValidation", `[@PATH]`, e.FieldPath().WithoutDots())
 }
 
 func (e *emailValidator) Imports() []string {
@@ -68,7 +74,16 @@ func (e *emailValidator) Imports() []string {
 }
 
 // ValidateEmail creates a new emailValidator for string types.
-func ValidateEmail(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName string) validator.Validator {
+func ValidateEmail(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+	fieldName := field.Names[0].Name
+	var fieldPath validator.FieldPath
+	if parentPath != "" {
+		fieldPath = validator.NewFieldPath(structName, parentPath, fieldName)
+	} else {
+		fieldPath = validator.NewFieldPath(structName, fieldName)
+	}
+	validator.GeneratorMemory[fmt.Sprintf(emailKey, fieldPath.WithoutDots())] = false
+	
 	typ := pass.TypesInfo.TypeOf(field.Type)
 
 	// Check if it's a string type
@@ -82,5 +97,6 @@ func ValidateEmail(pass *codegen.Pass, field *ast.Field, _ map[string]string, st
 		field:      field,
 		structName: structName,
 		ruleName:   ruleName,
+		parentPath: parentPath,
 	}
 }

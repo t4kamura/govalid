@@ -17,6 +17,7 @@ type numericValidator struct {
 	field      *ast.Field
 	structName string
 	ruleName   string
+	parentPath string
 }
 
 var _ validator.Validator = (*numericValidator)(nil)
@@ -31,8 +32,15 @@ func (m *numericValidator) FieldName() string {
 	return m.field.Names[0].Name
 }
 
+func (m *numericValidator) FieldPath() validator.FieldPath {
+	if m.parentPath == "" {
+		return validator.NewFieldPath(m.structName, m.FieldName())
+	}
+	return validator.NewFieldPath(m.structName, m.parentPath, m.FieldName())
+}
+
 func (m *numericValidator) Err() string {
-	key := fmt.Sprintf(numericKey, m.structName+m.FieldName())
+	key := fmt.Sprintf(numericKey, m.structName+m.FieldPath().WithoutDots())
 	if validator.GeneratorMemory[key] {
 		return ""
 	}
@@ -47,7 +55,7 @@ func (m *numericValidator) Err() string {
 	replacer := strings.NewReplacer(
 		"[@ERRVARIABLE]", m.ErrVariable(),
 		"[@FIELD]", m.FieldName(),
-		"[@PATH]", fmt.Sprintf("%s.%s", m.structName, m.FieldName()),
+		"[@PATH]", m.FieldPath().String(),
 		"[@TYPE]", m.ruleName,
 	)
 
@@ -55,7 +63,7 @@ func (m *numericValidator) Err() string {
 }
 
 func (m *numericValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]NumericValidation", "[@PATH]", m.structName+m.FieldName())
+	return strings.ReplaceAll("Err[@PATH]NumericValidation", "[@PATH]", m.FieldPath().WithoutDots())
 }
 
 func (m *numericValidator) Imports() []string {
@@ -65,7 +73,13 @@ func (m *numericValidator) Imports() []string {
 }
 
 // ValidateNumeric creates a new numericValidator if the 'numeric' marker is present and field is string.
-func ValidateNumeric(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName string) validator.Validator {
+func ValidateNumeric(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+	fieldPath := validator.NewFieldPath(structName, field.Names[0].Name)
+	if parentPath != "" {
+		fieldPath = validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
+	}
+	validator.GeneratorMemory[fmt.Sprintf(numericKey, structName+fieldPath.WithoutDots())] = false
+	
 	typ := pass.TypesInfo.TypeOf(field.Type)
 
 	// Check if it's a string type
@@ -79,5 +93,6 @@ func ValidateNumeric(pass *codegen.Pass, field *ast.Field, _ map[string]string, 
 		field:      field,
 		structName: structName,
 		ruleName:   ruleName,
+		parentPath: parentPath,
 	}
 }

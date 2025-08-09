@@ -39,7 +39,7 @@ func (m *minLengthValidator) FieldPath() validator.FieldPath {
 }
 
 func (m *minLengthValidator) Err() string {
-	key := fmt.Sprintf(minLengthKey, m.structName+m.FieldPath().WithoutDots())
+	key := fmt.Sprintf(minLengthKey, m.structName+m.FieldPath().CleanedPath())
 
 	if validator.GeneratorMemory[key] {
 		return ""
@@ -64,7 +64,7 @@ func (m *minLengthValidator) Err() string {
 }
 
 func (m *minLengthValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]MinLengthValidation", "[@PATH]", m.FieldPath().WithoutDots())
+	return strings.ReplaceAll("Err[@PATH]MinLengthValidation", "[@PATH]", m.FieldPath().CleanedPath())
 }
 
 func (m *minLengthValidator) Imports() []string {

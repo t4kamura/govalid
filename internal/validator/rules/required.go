@@ -57,7 +57,7 @@ func (r *requiredValidator) FieldPath() validator.FieldPath {
 }
 
 func (r *requiredValidator) Err() string {
-	key := fmt.Sprintf(requiredKey, r.FieldPath().WithoutDots())
+	key := fmt.Sprintf(requiredKey, r.FieldPath().CleanedPath())
 
 	if validator.GeneratorMemory[key] {
 		return ""
@@ -81,7 +81,7 @@ func (r *requiredValidator) Err() string {
 }
 
 func (r *requiredValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]RequiredValidation", "[@PATH]", r.FieldPath().WithoutDots())
+	return strings.ReplaceAll("Err[@PATH]RequiredValidation", "[@PATH]", r.FieldPath().CleanedPath())
 }
 
 func (r *requiredValidator) Imports() []string {
@@ -92,7 +92,7 @@ func (r *requiredValidator) Imports() []string {
 func ValidateRequired(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName, parentPath string) validator.Validator {
 	fieldName := field.Names[0].Name
 	fieldPath := validator.NewFieldPath(structName, parentPath, fieldName)
-	validator.GeneratorMemory[fmt.Sprintf(requiredKey, fieldPath.WithoutDots())] = false
+	validator.GeneratorMemory[fmt.Sprintf(requiredKey, fieldPath.CleanedPath())] = false
 
 	return &requiredValidator{
 		pass:       pass,

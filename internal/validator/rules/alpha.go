@@ -37,7 +37,7 @@ func (v *alphaValidator) FieldPath() validator.FieldPath {
 }
 
 func (v *alphaValidator) Err() string {
-	key := fmt.Sprintf(alphaKey, v.FieldPath().WithoutDots())
+	key := fmt.Sprintf(alphaKey, v.FieldPath().CleanedPath())
 
 	if validator.GeneratorMemory[key] {
 		return ""
@@ -61,7 +61,7 @@ func (v *alphaValidator) Err() string {
 }
 
 func (v *alphaValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]AlphaValidation", "[@PATH]", v.FieldPath().WithoutDots())
+	return strings.ReplaceAll("Err[@PATH]AlphaValidation", "[@PATH]", v.FieldPath().CleanedPath())
 }
 
 func (v *alphaValidator) Imports() []string {

@@ -107,7 +107,7 @@ func (u *uuidValidator) Err() string {
 		result.WriteString(u.generateValidationFunction())
 	}
 
-	key := fmt.Sprintf(uuidKey, u.structName+u.FieldPath().WithoutDots())
+	key := fmt.Sprintf(uuidKey, u.structName+u.FieldPath().CleanedPath())
 	if validator.GeneratorMemory[key] {
 		return result.String()
 	}
@@ -132,7 +132,7 @@ func (u *uuidValidator) Err() string {
 }
 
 func (u *uuidValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]UUIDValidation", "[@PATH]", u.FieldPath().WithoutDots())
+	return strings.ReplaceAll("Err[@PATH]UUIDValidation", "[@PATH]", u.FieldPath().CleanedPath())
 }
 
 func (u *uuidValidator) Imports() []string {

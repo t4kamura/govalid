@@ -56,7 +56,7 @@ func (e *enumValidator) FieldPath() validator.FieldPath {
 }
 
 func (e *enumValidator) Err() string {
-	key := fmt.Sprintf(enumKey, e.structName+e.FieldPath().WithoutDots())
+	key := fmt.Sprintf(enumKey, e.structName+e.FieldPath().CleanedPath())
 
 	if validator.GeneratorMemory[key] {
 		return ""
@@ -83,7 +83,7 @@ func (e *enumValidator) Err() string {
 }
 
 func (e *enumValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]EnumValidation", "[@PATH]", e.FieldPath().WithoutDots())
+	return strings.ReplaceAll("Err[@PATH]EnumValidation", "[@PATH]", e.FieldPath().CleanedPath())
 }
 
 func (e *enumValidator) Imports() []string {

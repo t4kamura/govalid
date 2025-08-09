@@ -39,7 +39,7 @@ func (m *maxLengthValidator) FieldPath() validator.FieldPath {
 }
 
 func (m *maxLengthValidator) Err() string {
-	key := fmt.Sprintf(maxLengthKey, m.structName+m.FieldPath().WithoutDots())
+	key := fmt.Sprintf(maxLengthKey, m.structName+m.FieldPath().CleanedPath())
 
 	if validator.GeneratorMemory[key] {
 		return ""
@@ -64,7 +64,7 @@ func (m *maxLengthValidator) Err() string {
 }
 
 func (m *maxLengthValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]MaxLengthValidation", "[@PATH]", m.FieldPath().WithoutDots())
+	return strings.ReplaceAll("Err[@PATH]MaxLengthValidation", "[@PATH]", m.FieldPath().CleanedPath())
 }
 
 func (m *maxLengthValidator) Imports() []string {

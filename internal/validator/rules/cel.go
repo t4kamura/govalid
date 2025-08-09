@@ -55,7 +55,7 @@ func (c *celValidator) FieldPath() validator.FieldPath {
 }
 
 func (c *celValidator) Err() string {
-	key := fmt.Sprintf(celKey, c.FieldPath().WithoutDots())
+	key := fmt.Sprintf(celKey, c.FieldPath().CleanedPath())
 
 	if validator.GeneratorMemory[key] {
 		return ""
@@ -80,7 +80,7 @@ func (c *celValidator) Err() string {
 }
 
 func (c *celValidator) ErrVariable() string {
-	return strings.ReplaceAll("Err[@PATH]CELValidation", "[@PATH]", c.FieldPath().WithoutDots())
+	return strings.ReplaceAll("Err[@PATH]CELValidation", "[@PATH]", c.FieldPath().CleanedPath())
 }
 
 func (c *celValidator) Imports() []string {

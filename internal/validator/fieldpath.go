@@ -19,8 +19,8 @@ func NewFieldPath(components ...string) FieldPath {
 	return FieldPath(strings.Join(nonEmpty, "."))
 }
 
-// WithoutDots returns the field path with all dots removed for use in variable names and keys.
-func (fp FieldPath) WithoutDots() string {
+// CleanedPath returns the field path with all dots removed for use in variable names and keys.
+func (fp FieldPath) CleanedPath() string {
 	return strings.ReplaceAll(string(fp), ".", "")
 }
 

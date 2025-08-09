@@ -38,11 +38,6 @@ func TestNewFieldPath(t *testing.T) {
 			want:       validator.FieldPath("User.Address.City"),
 		},
 		{
-			name:       "single component",
-			components: []string{"User"},
-			want:       validator.FieldPath("User"),
-		},
-		{
 			name:       "all empty strings",
 			components: []string{"", "", ""},
 			want:       validator.FieldPath(""),

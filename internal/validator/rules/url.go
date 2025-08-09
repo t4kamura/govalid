@@ -70,7 +70,7 @@ func (u *urlValidator) Imports() []string {
 }
 
 // ValidateURL creates a new urlValidator for string types.
-func ValidateURL(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+func ValidateURL(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName, parentPath string) validator.Validator {
 	fieldPath := validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
 	validator.GeneratorMemory[fmt.Sprintf(urlKey, structName+fieldPath.WithoutDots())] = false
 

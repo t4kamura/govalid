@@ -178,7 +178,7 @@ func analyzeMarker(pass *codegen.Pass, markersInspect markers.Markers, structTyp
 	return analyzed
 }
 
-func makeValidator(pass *codegen.Pass, markers markers.MarkerSet, field *ast.Field, structName string, parentPath string) []validator.Validator {
+func makeValidator(pass *codegen.Pass, markers markers.MarkerSet, field *ast.Field, structName, parentPath string) []validator.Validator {
 	validators := make([]validator.Validator, 0)
 
 	for _, marker := range markers {

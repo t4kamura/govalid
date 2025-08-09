@@ -71,7 +71,7 @@ func (l *lengthValidator) Imports() []string {
 }
 
 // ValidateLength creates a new lengthValidator if the field type is string and the length marker is present.
-func ValidateLength(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+func ValidateLength(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName, parentPath string) validator.Validator {
 	fieldPath := validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
 	validator.GeneratorMemory[fmt.Sprintf(lengthKey, structName+fieldPath.WithoutDots())] = false
 

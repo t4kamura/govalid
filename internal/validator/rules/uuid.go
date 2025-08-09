@@ -140,7 +140,7 @@ func (u *uuidValidator) Imports() []string {
 }
 
 // ValidateUUID creates a new uuidValidator for string types.
-func ValidateUUID(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+func ValidateUUID(pass *codegen.Pass, field *ast.Field, _ map[string]string, structName, ruleName, parentPath string) validator.Validator {
 	fieldPath := validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
 	validator.GeneratorMemory[fmt.Sprintf(uuidKey, structName+fieldPath.WithoutDots())] = false
 

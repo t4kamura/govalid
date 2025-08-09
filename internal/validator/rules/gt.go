@@ -72,7 +72,7 @@ func (m *gtValidator) Imports() []string {
 }
 
 // ValidateGT creates a new gtValidator if the field type is numeric and the max marker is present.
-func ValidateGT(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName string, parentPath string) validator.Validator {
+func ValidateGT(pass *codegen.Pass, field *ast.Field, expressions map[string]string, structName, ruleName, parentPath string) validator.Validator {
 	fieldPath := validator.NewFieldPath(structName, parentPath, field.Names[0].Name)
 	validator.GeneratorMemory[fmt.Sprintf(gtKey, structName+fieldPath.WithoutDots())] = false
 

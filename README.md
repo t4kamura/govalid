@@ -264,6 +264,16 @@ govalid consistently outperforms reflection-based validators by **5x to 44x**:
 
 [📊 View Complete Benchmarks](test/benchmark/README.md)
 
+### 🔧 Development Setup
+
+For contributors, install lefthook to enable pre-commit checks:
+
+```bash
+make install-lefthook
+```
+
+This will install and configure lefthook to run automatic checks before each commit, ensuring code quality and consistency.
+
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE) file for details.

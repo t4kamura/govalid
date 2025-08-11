@@ -1,4 +1,5 @@
 GOLANGCI_LINT = go tool -modfile tools/go.mod github.com/golangci/golangci-lint/v2/cmd/golangci-lint
+LEFTHOOK = go tool -modfile tools/go.mod github.com/evilmartians/lefthook
 
 # Default fuzz test duration
 FUZZ_TIME ?= 30s
@@ -24,6 +25,11 @@ fmt: ## Format code with golangci-lint
 .PHONY: fmt-diff
 fmt-diff: ## Show code formatting differences
 	${GOLANGCI_LINT} fmt --diff ./...
+
+# Install lefthook
+.PHONY: install-lefthook
+install-lefthook:
+	${LEFTHOOK} install
 
 # Documentation targets
 .PHONY: docs-dev

@@ -271,7 +271,7 @@ For contributors, install lefthook to enable pre-commit checks:
 make install-lefthook
 ```
 
-This will install and configure lefthook to run automatic checks before each commit, ensuring code quality and consistency.
+Because of this, lefthook is installed, then the code-base would be checked automatically before each commit, ensuring code quality and consistency.
 
 ## 📄 License
 

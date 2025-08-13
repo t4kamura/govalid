@@ -23,3 +23,4 @@ pre-commit:
       root: test
       run: go mod tidy -diff
       glob: "test/{go.mod,go.sum}"
+      

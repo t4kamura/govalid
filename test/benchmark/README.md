@@ -4,99 +4,99 @@ Performance comparison between govalid and popular Go validation libraries.
 
 ## Latest Results
 
-**Benchmarked on:** 2025-08-15  
+**Benchmarked on:** 2025-08-16  
 **Platform:** Linux 6.11.0-1018-azure x86_64  
 **Go version:** go1.24.3
 
 ## Raw Benchmark Data
 
 ```
-BenchmarkGoValidAlpha-4                    	100000000	        10.25 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoPlaygroundAlpha-4               	 2513702	       483.7 ns/op	       0 B/op	       0 allocs/op
-BenchmarkAsaskevichGovalidatorAlpha-4      	10666924	       112.6 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGookitValidateAlpha-4             	   53282	     22411 ns/op	   16937 B/op	     101 allocs/op
-BenchmarkGoValidCELConcurrent-4            	519052612	         2.277 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoValidCELMultipleExpressions-4   	268293296	         4.566 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoValidCELBasic-4                 	262907355	         4.557 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoValidCELCrossField-4            	333640660	         3.569 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoValidAlpha-4                    	120587086	         9.952 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoPlaygroundAlpha-4               	 2565640	       471.0 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAsaskevichGovalidatorAlpha-4      	11230387	       107.7 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGookitValidateAlpha-4             	   56906	     21054 ns/op	   16937 B/op	     101 allocs/op
+BenchmarkGoValidCELConcurrent-4            	547633404	         2.193 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoValidCELMultipleExpressions-4   	275265040	         4.360 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoValidCELBasic-4                 	275247038	         4.363 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoValidCELCrossField-4            	349937134	         3.431 ns/op	       0 B/op	       0 allocs/op
 BenchmarkGoValidCELStringLength-4          	1000000000	         1.000 ns/op	       0 B/op	       0 allocs/op
 BenchmarkGoValidCELNumericComparison-4     	1000000000	         1.000 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoValidEmail-4                    	19327504	        57.45 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoPlaygroundEmail-4               	  862719	      1176 ns/op	      89 B/op	       5 allocs/op
-BenchmarkGoValidatorEmail-4                	 1265624	       950.2 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGookitValidateEmail-4             	   64688	     18485 ns/op	   15857 B/op	      76 allocs/op
-BenchmarkGoValidEnum-4                     	283458189	         4.242 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoValidGT-4                       	409061706	         2.919 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoPlaygroundGT-4                  	10872572	       111.8 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoValidatorGT-4                   	12774891	        92.67 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoValidGTE-4                      	368692372	         3.250 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoPlaygroundGTE-4                 	10792124	       111.7 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoValidLength-4                   	152152006	         7.855 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoPlaygroundLength-4              	 9721320	       123.1 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoValidatorLength-4               	 4480106	       266.4 ns/op	      32 B/op	       2 allocs/op
-BenchmarkGookitValidateLength-4            	   69578	     17251 ns/op	   15616 B/op	      79 allocs/op
-BenchmarkGoValidLT-4                       	374337532	         3.179 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoPlaygroundLT-4                  	10753572	       111.2 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoValidLTE-4                      	450776774	         2.611 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoPlaygroundLTE-4                 	10510958	       114.5 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoValidMaxItems-4                 	194776780	         6.162 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoPlaygroundMaxItems-4            	 8046544	       148.9 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoValidMaxLength-4                	36840680	        32.19 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoPlaygroundMaxLength-4           	 8438376	       141.8 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoValidatorMaxLength-4            	 3983755	       304.1 ns/op	      32 B/op	       2 allocs/op
-BenchmarkGookitValidateMaxLength-4         	   69100	     17506 ns/op	   15648 B/op	      81 allocs/op
-BenchmarkGoValidMinItems-4                 	182254294	         6.607 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoPlaygroundMinItems-4            	 8201967	       150.1 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoValidMinLength-4                	50087284	        23.64 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoPlaygroundMinLength-4           	 9445496	       125.5 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoValidatorMinLength-4            	 3855003	       308.1 ns/op	      32 B/op	       2 allocs/op
-BenchmarkGoValidNumeric-4                  	100000000	        10.10 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoPlaygroundNumeric-4             	12836562	        91.46 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoValidatorNumeric-4              	 9032996	       134.8 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGookitValidateNumeric-4           	   65862	     17987 ns/op	   15574 B/op	      78 allocs/op
-BenchmarkGoValidRequired-4                 	280244545	         4.238 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoPlaygroundRequired-4            	 7705500	       157.8 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoValidatorRequired-4             	529326152	         2.241 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGookitValidateRequired-4          	   70465	     16820 ns/op	   15488 B/op	      73 allocs/op
-BenchmarkGoValidURL-4                      	18756708	        62.20 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoPlaygroundURL-4                 	 2349837	       509.8 ns/op	     144 B/op	       1 allocs/op
-BenchmarkGoValidatorURL-4                  	   95130	     12666 ns/op	     145 B/op	       1 allocs/op
-BenchmarkGookitValidateURL-4               	   66793	     18030 ns/op	   15681 B/op	      77 allocs/op
-BenchmarkGoValidUUID-4                     	23199217	        50.50 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoPlaygroundUUID-4                	 2528600	       473.7 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGoValidatorUUID-4                 	 3331137	       359.3 ns/op	       0 B/op	       0 allocs/op
-BenchmarkGookitValidateUUID-4              	   66866	     18126 ns/op	   15542 B/op	      76 allocs/op
+BenchmarkGoValidEmail-4                    	21691807	        55.81 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoPlaygroundEmail-4               	 1000000	      1080 ns/op	      89 B/op	       5 allocs/op
+BenchmarkGoValidatorEmail-4                	 1330288	       897.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGookitValidateEmail-4             	   70838	     17102 ns/op	   15872 B/op	      76 allocs/op
+BenchmarkGoValidEnum-4                     	296579954	         4.044 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoValidGT-4                       	427024551	         2.806 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoPlaygroundGT-4                  	11312290	       106.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoValidatorGT-4                   	13736905	        87.87 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoValidGTE-4                      	385486027	         3.115 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoPlaygroundGTE-4                 	11366497	       105.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoValidLength-4                   	160630404	         7.468 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoPlaygroundLength-4              	10070362	       119.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoValidatorLength-4               	 4873629	       245.7 ns/op	      32 B/op	       2 allocs/op
+BenchmarkGookitValidateLength-4            	   74427	     16162 ns/op	   15616 B/op	      79 allocs/op
+BenchmarkGoValidLT-4                       	385406454	         3.113 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoPlaygroundLT-4                  	11378107	       105.4 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoValidLTE-4                      	481680627	         2.492 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoPlaygroundLTE-4                 	10883443	       111.3 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoValidMaxItems-4                 	202758931	         5.927 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoPlaygroundMaxItems-4            	 8323197	       144.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoValidMaxLength-4                	37751620	        31.75 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoPlaygroundMaxLength-4           	 8787621	       136.9 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoValidatorMaxLength-4            	 4255162	       280.8 ns/op	      32 B/op	       2 allocs/op
+BenchmarkGookitValidateMaxLength-4         	   74248	     16138 ns/op	   15648 B/op	      81 allocs/op
+BenchmarkGoValidMinItems-4                 	192755456	         6.220 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoPlaygroundMinItems-4            	 8395002	       142.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoValidMinLength-4                	52081052	        23.04 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoPlaygroundMinLength-4           	 9878415	       122.1 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoValidatorMinLength-4            	 4241484	       281.3 ns/op	      32 B/op	       2 allocs/op
+BenchmarkGoValidNumeric-4                  	124365764	         9.648 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoPlaygroundNumeric-4             	13754833	        86.74 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoValidatorNumeric-4              	 9460560	       127.9 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGookitValidateNumeric-4           	   71635	     16696 ns/op	   15574 B/op	      78 allocs/op
+BenchmarkGoValidRequired-4                 	296681864	         4.047 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoPlaygroundRequired-4            	 8024377	       148.8 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoValidatorRequired-4             	551228768	         2.178 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGookitValidateRequired-4          	   75736	     15590 ns/op	   15488 B/op	      73 allocs/op
+BenchmarkGoValidURL-4                      	20643026	        57.95 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoPlaygroundURL-4                 	 2525745	       476.3 ns/op	     144 B/op	       1 allocs/op
+BenchmarkGoValidatorURL-4                  	  101060	     11790 ns/op	     146 B/op	       1 allocs/op
+BenchmarkGookitValidateURL-4               	   71356	     16759 ns/op	   15681 B/op	      77 allocs/op
+BenchmarkGoValidUUID-4                     	24658245	        48.57 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoPlaygroundUUID-4                	 2689501	       447.9 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGoValidatorUUID-4                 	 3561416	       337.3 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGookitValidateUUID-4              	   71746	     16760 ns/op	   15542 B/op	      76 allocs/op
 ```
 
 ## Performance Comparison
 
 | Validator | govalid | go-playground | vs go-playground | asaskevich/govalidator | vs asaskevich | gookit/validate | vs gookit |
 |-----------|---------|---------------|------------------|----------------------|---------------|----------------|----------|
-| LTE | 2.611 / 0 allocs | 114.5 / 0 allocs | **43.9x** | N/A | N/A | N/A | N/A |
-| Enum | 4.242 / 0 allocs | N/A | N/A | N/A | N/A | N/A | N/A |
-| Email | 57.45 / 0 allocs | 1176 / 89 B / 5 allocs | **20.5x** | 950.2 / 0 allocs | **16.5x** | 18485 / 15857 B / 76 allocs | **321.8x** |
-| GTE | 3.250 / 0 allocs | 111.7 / 0 allocs | **34.4x** | N/A | N/A | N/A | N/A |
-| MinLength | 23.64 / 0 allocs | 125.5 / 0 allocs | **5.3x** | 308.1 / 32 B / 2 allocs | **13.0x** | N/A | N/A |
-| UUID | 50.50 / 0 allocs | 473.7 / 0 allocs | **9.4x** | 359.3 / 0 allocs | **7.1x** | 18126 / 15542 B / 76 allocs | **358.9x** |
-| MaxItems | 6.162 / 0 allocs | 148.9 / 0 allocs | **24.2x** | N/A | N/A | N/A | N/A |
-| MaxLength | 32.19 / 0 allocs | 141.8 / 0 allocs | **4.4x** | 304.1 / 32 B / 2 allocs | **9.4x** | 17506 / 15648 B / 81 allocs | **543.8x** |
-| LT | 3.179 / 0 allocs | 111.2 / 0 allocs | **35.0x** | N/A | N/A | N/A | N/A |
-| MinItems | 6.607 / 0 allocs | 150.1 / 0 allocs | **22.7x** | N/A | N/A | N/A | N/A |
-| Alpha | 10.25 / 0 allocs | 483.7 / 0 allocs | **47.2x** | 112.6 / 0 allocs | **11.0x** | 22411 / 16937 B / 101 allocs | **2186.4x** |
-| Required | 4.238 / 0 allocs | 157.8 / 0 allocs | **37.2x** | 2.241 / 0 allocs | **0.5x** | 16820 / 15488 B / 73 allocs | **3968.9x** |
-| Length | 7.855 / 0 allocs | 123.1 / 0 allocs | **15.7x** | 266.4 / 32 B / 2 allocs | **33.9x** | 17251 / 15616 B / 79 allocs | **2196.2x** |
-| URL | 62.20 / 0 allocs | 509.8 / 144 B / 1 allocs | **8.2x** | 12666 / 145 B / 1 allocs | **203.6x** | 18030 / 15681 B / 77 allocs | **289.9x** |
-| Numeric | 10.10 / 0 allocs | 91.46 / 0 allocs | **9.1x** | 134.8 / 0 allocs | **13.3x** | 17987 / 15574 B / 78 allocs | **1780.9x** |
-| GT | 2.919 / 0 allocs | 111.8 / 0 allocs | **38.3x** | 92.67 / 0 allocs | **31.7x** | N/A | N/A |
+| LTE | 2.492 / 0 allocs | 111.3 / 0 allocs | **44.7x** | N/A | N/A | N/A | N/A |
+| Enum | 4.044 / 0 allocs | N/A | N/A | N/A | N/A | N/A | N/A |
+| Email | 55.81 / 0 allocs | 1080 / 89 B / 5 allocs | **19.4x** | 897.2 / 0 allocs | **16.1x** | 17102 / 15872 B / 76 allocs | **306.4x** |
+| GTE | 3.115 / 0 allocs | 105.6 / 0 allocs | **33.9x** | N/A | N/A | N/A | N/A |
+| MinLength | 23.04 / 0 allocs | 122.1 / 0 allocs | **5.3x** | 281.3 / 32 B / 2 allocs | **12.2x** | N/A | N/A |
+| UUID | 48.57 / 0 allocs | 447.9 / 0 allocs | **9.2x** | 337.3 / 0 allocs | **6.9x** | 16760 / 15542 B / 76 allocs | **345.1x** |
+| MaxItems | 5.927 / 0 allocs | 144.5 / 0 allocs | **24.4x** | N/A | N/A | N/A | N/A |
+| MaxLength | 31.75 / 0 allocs | 136.9 / 0 allocs | **4.3x** | 280.8 / 32 B / 2 allocs | **8.8x** | 16138 / 15648 B / 81 allocs | **508.3x** |
+| LT | 3.113 / 0 allocs | 105.4 / 0 allocs | **33.9x** | N/A | N/A | N/A | N/A |
+| MinItems | 6.220 / 0 allocs | 142.5 / 0 allocs | **22.9x** | N/A | N/A | N/A | N/A |
+| Alpha | 9.952 / 0 allocs | 471.0 / 0 allocs | **47.3x** | 107.7 / 0 allocs | **10.8x** | 21054 / 16937 B / 101 allocs | **2115.6x** |
+| Required | 4.047 / 0 allocs | 148.8 / 0 allocs | **36.8x** | 2.178 / 0 allocs | **0.5x** | 15590 / 15488 B / 73 allocs | **3852.2x** |
+| Length | 7.468 / 0 allocs | 119.2 / 0 allocs | **16.0x** | 245.7 / 32 B / 2 allocs | **32.9x** | 16162 / 15616 B / 79 allocs | **2164.2x** |
+| URL | 57.95 / 0 allocs | 476.3 / 144 B / 1 allocs | **8.2x** | 11790 / 146 B / 1 allocs | **203.5x** | 16759 / 15681 B / 77 allocs | **289.2x** |
+| Numeric | 9.648 / 0 allocs | 86.74 / 0 allocs | **9.0x** | 127.9 / 0 allocs | **13.3x** | 16696 / 15574 B / 78 allocs | **1730.5x** |
+| GT | 2.806 / 0 allocs | 106.2 / 0 allocs | **37.8x** | 87.87 / 0 allocs | **31.3x** | N/A | N/A |
 
 ## CEL Expression Validation (govalid Exclusive)
 
 | CEL Validator | govalid (ns/op) | Allocations |
 |---------------|-----------------|-------------|
-| CELConcurrent | 2.277 | 0 allocs |
-| CELMultipleExpressions | 4.566 | 0 allocs |
-| CELBasic | 4.557 | 0 allocs |
-| CELCrossField | 3.569 | 0 allocs |
+| CELConcurrent | 2.193 | 0 allocs |
+| CELMultipleExpressions | 4.360 | 0 allocs |
+| CELBasic | 4.363 | 0 allocs |
+| CELCrossField | 3.431 | 0 allocs |
 | CELStringLength | 1.000 | 0 allocs |
 | CELNumericComparison | 1.000 | 0 allocs |
 

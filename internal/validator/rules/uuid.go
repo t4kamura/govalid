@@ -115,19 +115,34 @@ func (u *uuidValidator) Err() string {
 
 	validator.GeneratorMemory[key] = true
 
+	const deprecationNoticeTemplate = `
+		// Deprecated: Use [@ERRVARIABLE]
+		//
+		// [@LEGACYERRVAR] is deprecated and is kept for compatibility purpose.
+		[@LEGACYERRVAR] = [@ERRVARIABLE]
+	`
+
 	const errTemplate = `
 		// [@ERRVARIABLE] is the error returned when the field is not a valid UUID.
 		[@ERRVARIABLE] = govaliderrors.ValidationError{Reason:"field [@FIELD] must be a valid UUID",Path:"[@PATH]",Type:"[@TYPE]"}
 	`
 
+	legacyErrVarName := fmt.Sprintf("Err%s%sUUIDValidation", u.structName, u.FieldName())
+	currentErrVarName := u.ErrVariable()
+
 	replacer := strings.NewReplacer(
-		"[@ERRVARIABLE]", u.ErrVariable(),
+		"[@ERRVARIABLE]", currentErrVarName,
+		"[@LEGACYERRVAR]", legacyErrVarName,
 		"[@FIELD]", u.FieldName(),
 		"[@PATH]", u.FieldPath().String(),
 		"[@TYPE]", u.ruleName,
 	)
 
-	result.WriteString(replacer.Replace(errTemplate))
+	if currentErrVarName != legacyErrVarName {
+		result.WriteString(replacer.Replace(deprecationNoticeTemplate + errTemplate))
+	} else {
+		result.WriteString(replacer.Replace(errTemplate))
+	}
 
 	return result.String()
 }

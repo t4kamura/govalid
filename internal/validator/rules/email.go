@@ -48,17 +48,32 @@ func (e *emailValidator) Err() string {
 
 	validator.GeneratorMemory[key] = true
 
+	const deprecationNoticeTemplate = `
+		// Deprecated: Use [@ERRVARIABLE]
+		//
+		// [@LEGACYERRVAR] is deprecated and is kept for compatibility purpose.
+		[@LEGACYERRVAR] = [@ERRVARIABLE]
+	`
+
 	const errTemplate = `
 		// [@ERRVARIABLE] is the error returned when the field is not a valid email address.
 		[@ERRVARIABLE] = govaliderrors.ValidationError{Reason:"field [@FIELD] must be a valid email address",Path:"[@PATH]",Type:"[@TYPE]"}
 	`
 
+	legacyErrVarName := fmt.Sprintf("Err%s%sEmailValidation", e.structName, e.FieldName())
+	currentErrVarName := e.ErrVariable()
+
 	replacer := strings.NewReplacer(
-		"[@ERRVARIABLE]", e.ErrVariable(),
+		"[@ERRVARIABLE]", currentErrVarName,
+		"[@LEGACYERRVAR]", legacyErrVarName,
 		"[@FIELD]", e.FieldName(),
 		"[@PATH]", e.FieldPath().String(),
 		"[@TYPE]", e.ruleName,
 	)
+
+	if currentErrVarName != legacyErrVarName {
+		return replacer.Replace(deprecationNoticeTemplate + errTemplate)
+	}
 
 	return replacer.Replace(errTemplate)
 }
